@@ -288,6 +288,29 @@
   .btn-save:active, .btn-cancel:active{
     transform:scale(0.97);
   }
+
+  .toast{
+    position:fixed;
+    bottom:1.5rem;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:0.7rem 1.2rem;
+    border-radius:999px;
+    font-size:0.85rem;
+    font-weight:600;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.2s ease, transform 0.2s ease;
+    z-index:60;
+    white-space:nowrap;
+  }
+
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
 </style>
 </head>
 <body>
@@ -363,7 +386,7 @@
       <div class="card-title">منتجات التنظيف</div>
     </a>
 
-    <a href="pantry.html" class="card" aria-label="اضافة قسم جديد">
+    <a href="#" id="addProductBtn" class="card" aria-label="اضافة منتج">
       <div class="card-image">
         <span class="placeholder-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="36" height="36" aria-hidden="true">
@@ -386,106 +409,87 @@
 
 <div class="overlay" id="overlay">
   <div class="add-panel">
-    <p class="add-panel-title">قسم جديد</p>
+    <p class="add-panel-title">إضافة منتج</p>
 
-    <label class="field-label" for="catName">اسم القسم</label>
-    <input type="text" id="catName" class="field-input" placeholder="مثال: فواكه مجففة">
+    <label class="field-label" for="productName">اسم المنتج</label>
+    <input type="text" id="productName" class="field-input" placeholder="مثال: خبز طري">
 
-    <label class="field-label" for="catLink">اسم الصفحة (اختياري)</label>
-    <input type="text" id="catLink" class="field-input" placeholder="مثال: dried-fruits.html">
+    <label class="field-label" for="productNote">ملاحظة (اختياري)</label>
+    <input type="text" id="productNote" class="field-input" placeholder="مثال: بدون سكر">
 
     <div class="panel-actions">
       <button type="button" class="btn-cancel" id="cancelBtn">إلغاء</button>
-      <button type="button" class="btn-save" id="saveBtn">إضافة</button>
+      <button type="button" class="btn-save" id="saveBtn">إضافة إلى اللائحة</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast">تمت الإضافة إلى اللائحة</div>
+
 <script>
-  const grid = document.querySelector('.grid');
-  const addCardBtn = document.getElementById('addCardBtn');
+  const addProductBtn = document.getElementById('addProductBtn');
   const overlay = document.getElementById('overlay');
   const cancelBtn = document.getElementById('cancelBtn');
   const saveBtn = document.getElementById('saveBtn');
-  const catName = document.getElementById('catName');
-  const catLink = document.getElementById('catLink');
+  const productName = document.getElementById('productName');
+  const productNote = document.getElementById('productNote');
+  const toast = document.getElementById('toast');
 
-  const STORAGE_KEY = 'chrili-custom-categories';
+  const LIST_STORAGE_KEY = 'chrili-shopping-list';
+  const CATEGORY = 'أخرى';
 
-  const colorClasses = ['c1', 'c2', 'c3'];
-  const colorStyles = {
-    c1: { bg: 'var(--teal-light)', ic: 'var(--teal-dark)' },
-    c2: { bg: 'var(--amber-light)', ic: 'var(--amber-dark)' },
-    c3: { bg: 'var(--blue-light)', ic: 'var(--blue-dark)' }
-  };
+  let toastTimer = null;
 
-  function slugify(text){
-    return text.trim().toLowerCase()
-      .replace(/[^\p{L}\p{N}]+/gu, '-')
-      .replace(/^-+|-+$/g, '') || 'category';
-  }
-
-  function createCard(name, link, colorKey){
-    const a = document.createElement('a');
-    a.className = 'card';
-    a.href = link;
-    const colors = colorStyles[colorKey];
-    a.innerHTML = `
-      <div class="card-image" style="background:${colors.bg}">
-        <span class="placeholder-icon" style="color:${colors.ic}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>
-        </span>
-      </div>
-      <div class="card-title">${name}</div>
-    `;
-    return a;
-  }
-
-  function addCategory(name, link, save){
-    const count = grid.querySelectorAll('.card').length;
-    const colorKey = colorClasses[count % 3];
-    const finalLink = link || (slugify(name) + '.html');
-    const card = createCard(name, finalLink, colorKey);
-    grid.insertBefore(card, addCardBtn);
-
-    if(save){
-      const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      list.push({ name, link: finalLink });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    }
+  function showToast(message){
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   }
 
   function openPanel(){
     overlay.classList.add('open');
-    catName.value = '';
-    catLink.value = '';
-    setTimeout(() => catName.focus(), 50);
+    productName.value = '';
+    productNote.value = '';
+    setTimeout(() => productName.focus(), 50);
   }
 
   function closePanel(){
     overlay.classList.remove('open');
   }
 
-  if(addCardBtn){ addCardBtn.addEventListener('click', openPanel); }
+  addProductBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openPanel();
+  });
+
   cancelBtn.addEventListener('click', closePanel);
   overlay.addEventListener('click', (e) => { if(e.target === overlay) closePanel(); });
 
-  saveBtn.addEventListener('click', () => {
-    const name = catName.value.trim();
-    if(!name) { catName.focus(); return; }
-    addCategory(name, catLink.value.trim(), true);
-    closePanel();
-  });
+  function addProductToList(){
+    const name = productName.value.trim();
+    if(!name){ productName.focus(); return; }
+    const note = productNote.value.trim();
 
-  catName.addEventListener('keydown', (e) => {
+    const list = JSON.parse(localStorage.getItem(LIST_STORAGE_KEY) || '[]');
+    const existingIndex = list.findIndex(e => e.name === name && e.category === CATEGORY);
+    const entry = { name, category: CATEGORY, qty: 1, unit: 'piece', note: note || undefined, addedAt: Date.now() };
+    if(existingIndex > -1){
+      list[existingIndex] = entry;
+    } else {
+      list.push(entry);
+    }
+    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify(list));
+
+    closePanel();
+    showToast(`${name} — تمت الإضافة إلى اللائحة`);
+  }
+
+  saveBtn.addEventListener('click', addProductToList);
+
+  productName.addEventListener('keydown', (e) => {
     if(e.key === 'Enter') saveBtn.click();
   });
-
-  // restore previously added categories
-  (function restore(){
-    const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    list.forEach(item => addCategory(item.name, item.link, false));
-  })();
 </script>
 
 </body>

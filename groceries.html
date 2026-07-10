@@ -3,18 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>خضر — Chrili</title>
+<title>مواد غذائية — Chrili</title>
 <style>
   :root{
     --teal:#1D9E75;
     --teal-dark:#0F6E56;
     --teal-light:#E1F5EE;
-    --amber:#EF9F27;
-    --amber-dark:#854F0B;
-    --amber-light:#FAEEDA;
-    --blue:#378ADD;
-    --blue-dark:#0C447C;
-    --blue-light:#E6F1FB;
     --bg:#FAFAF8;
     --card-bg:#FFFFFF;
     --ink:#22221F;
@@ -47,263 +41,111 @@
     gap:0.75rem;
   }
 
-  .header-left{
-    display:flex;
-    align-items:center;
-    gap:0.75rem;
-  }
+  .header-left{ display:flex; align-items:center; gap:0.75rem; }
 
   .back-btn{
-    width:38px;
-    height:38px;
-    border-radius:12px;
-    background:var(--teal-light);
-    color:var(--teal-dark);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-decoration:none;
-    flex-shrink:0;
+    width:38px; height:38px; border-radius:12px;
+    background:var(--teal-light); color:var(--teal-dark);
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none; flex-shrink:0;
   }
-
   .back-btn svg{ width:20px; height:20px; }
 
   .list-btn{
-    width:38px;
-    height:38px;
-    border-radius:12px;
-    background:var(--bg);
-    color:var(--ink-soft);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-decoration:none;
-    flex-shrink:0;
-    border:1px solid var(--border);
+    width:38px; height:38px; border-radius:12px;
+    background:var(--bg); color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none; flex-shrink:0; border:1px solid var(--border);
   }
-
   .list-btn svg{ width:19px; height:19px; }
 
-  header h1{
-    font-size:1.1rem;
-    font-weight:700;
-  }
+  header h1{ font-size:1.1rem; font-weight:700; }
 
-  main{
-    padding:1rem 1.25rem;
-    max-width:520px;
-    margin:0 auto;
-  }
+  main{ padding:1rem 1.25rem; max-width:520px; margin:0 auto; }
 
-  .list{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:0.6rem;
-  }
+  .list{ display:grid; grid-template-columns:repeat(3, 1fr); gap:0.6rem; }
 
   .item-row{
-    background:var(--card-bg);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:0.75rem 0.5rem;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    text-align:center;
-    gap:0.4rem;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-    transition:transform 0.1s ease;
-    position:relative;
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:14px; padding:0.75rem 0.5rem;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:0.4rem; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    transition:transform 0.1s ease; position:relative;
   }
-
   .item-row:active{ transform:scale(0.96); }
-
-  .item-row.in-list{
-    border-color:var(--teal);
-    background:var(--teal-light);
-  }
+  .item-row.in-list{ border-color:var(--teal); background:var(--teal-light); }
 
   .item-icon{
-    width:38px;
-    height:38px;
-    border-radius:10px;
-    background:var(--teal-light);
-    color:var(--teal-dark);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    font-size:1.05rem;
-    font-weight:700;
+    width:38px; height:38px; border-radius:10px;
+    background:var(--teal-light); color:var(--teal-dark);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:1.05rem; font-weight:700;
   }
 
   .item-info{ min-width:0; width:100%; }
-
-  .item-name{
-    font-size:0.82rem;
-    font-weight:600;
-    line-height:1.25;
-  }
-
-  .item-qty{
-    font-size:0.7rem;
-    color:var(--teal-dark);
-    font-weight:700;
-    margin-top:1px;
-    display:none;
-  }
-
+  .item-name{ font-size:0.82rem; font-weight:600; line-height:1.25; }
+  .item-qty{ font-size:0.7rem; color:var(--teal-dark); font-weight:700; margin-top:1px; display:none; }
   .item-qty.show{ display:block; }
 
   .check-badge{
-    position:absolute;
-    top:6px;
-    left:6px;
-    width:16px;
-    height:16px;
-    border-radius:50%;
-    background:var(--teal);
-    color:#fff;
-    display:none;
-    align-items:center;
-    justify-content:center;
+    position:absolute; top:6px; left:6px; width:16px; height:16px;
+    border-radius:50%; background:var(--teal); color:#fff;
+    display:none; align-items:center; justify-content:center;
   }
-
   .check-badge.show{ display:flex; }
   .check-badge svg{ width:10px; height:10px; }
 
-  /* toast */
   .toast{
-    position:fixed;
-    bottom:1.5rem;
-    left:50%;
+    position:fixed; bottom:1.5rem; left:50%;
     transform:translateX(-50%) translateY(20px);
-    background:var(--ink);
-    color:#fff;
-    padding:0.7rem 1.2rem;
-    border-radius:999px;
-    font-size:0.85rem;
-    font-weight:600;
-    opacity:0;
-    pointer-events:none;
+    background:var(--ink); color:#fff; padding:0.7rem 1.2rem;
+    border-radius:999px; font-size:0.85rem; font-weight:600;
+    opacity:0; pointer-events:none;
     transition:opacity 0.2s ease, transform 0.2s ease;
-    z-index:60;
-    white-space:nowrap;
+    z-index:60; white-space:nowrap;
   }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
-  .toast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-  }
-
-  /* bottom sheet */
   .overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(34,34,31,0.45);
-    display:none;
-    align-items:flex-end;
-    justify-content:center;
-    z-index:50;
+    position:fixed; inset:0; background:rgba(34,34,31,0.45);
+    display:none; align-items:flex-end; justify-content:center; z-index:50;
   }
-
   .overlay.open{ display:flex; }
 
   .sheet{
-    background:var(--card-bg);
-    width:100%;
-    max-width:520px;
+    background:var(--card-bg); width:100%; max-width:520px;
     border-radius:22px 22px 0 0;
     padding:1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
   }
-
-  .sheet-title{
-    font-size:1.05rem;
-    font-weight:700;
-    margin-bottom:1.2rem;
-  }
+  .sheet-title{ font-size:1.05rem; font-weight:700; margin-bottom:1.2rem; }
 
   .unit-toggle{
-    display:flex;
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:4px;
-    gap:4px;
+    display:flex; background:var(--bg); border:1px solid var(--border);
+    border-radius:12px; padding:4px; gap:4px;
   }
-
   .unit-btn{
-    flex:1;
-    padding:0.55rem;
-    border:none;
-    background:transparent;
-    border-radius:9px;
-    font-family:inherit;
-    font-size:0.88rem;
-    font-weight:600;
-    color:var(--ink-soft);
-    cursor:pointer;
+    flex:1; padding:0.55rem; border:none; background:transparent;
+    border-radius:9px; font-family:inherit; font-size:0.88rem;
+    font-weight:600; color:var(--ink-soft); cursor:pointer;
   }
+  .unit-btn.active{ background:var(--teal); color:#fff; }
 
-  .unit-btn.active{
-    background:var(--teal);
-    color:#fff;
-  }
-
-  .stepper{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:1.25rem;
-    margin:1.4rem 0;
-  }
-
+  .stepper{ display:flex; align-items:center; justify-content:center; gap:1.25rem; margin:1.4rem 0; }
   .step-btn{
-    width:48px;
-    height:48px;
-    border-radius:14px;
-    border:1px solid var(--border);
-    background:var(--bg);
-    font-size:1.3rem;
-    font-weight:700;
-    color:var(--teal-dark);
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:48px; height:48px; border-radius:14px; border:1px solid var(--border);
+    background:var(--bg); font-size:1.3rem; font-weight:700;
+    color:var(--teal-dark); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
   }
-
   .step-btn:active{ transform:scale(0.94); }
-
-  .step-value{
-    font-size:1.6rem;
-    font-weight:700;
-    min-width:70px;
-    text-align:center;
-  }
-
-  .step-unit-label{
-    text-align:center;
-    font-size:0.8rem;
-    color:var(--ink-soft);
-    margin-top:-1rem;
-    margin-bottom:1.2rem;
-  }
+  .step-value{ font-size:1.6rem; font-weight:700; min-width:70px; text-align:center; }
+  .step-unit-label{ text-align:center; font-size:0.8rem; color:var(--ink-soft); margin-top:-1rem; margin-bottom:1.2rem; }
 
   .btn-add{
-    width:100%;
-    padding:0.85rem;
-    border:none;
-    border-radius:14px;
-    background:var(--teal);
-    color:#fff;
-    font-size:0.98rem;
-    font-weight:700;
-    font-family:inherit;
-    cursor:pointer;
+    width:100%; padding:0.85rem; border:none; border-radius:14px;
+    background:var(--teal); color:#fff; font-size:0.98rem; font-weight:700;
+    font-family:inherit; cursor:pointer;
   }
-
   .btn-add:active{ transform:scale(0.98); }
 </style>
 </head>
@@ -314,7 +156,7 @@
     <a href="index.html" class="back-btn" aria-label="رجوع">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 9 12l6 6"/></svg>
     </a>
-    <h1>خضر</h1>
+    <h1>مواد غذائية</h1>
   </div>
   <a href="list.html" class="list-btn" aria-label="اللائحة">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>
@@ -327,13 +169,9 @@
 
 <div class="overlay" id="overlay">
   <div class="sheet">
-    <p class="sheet-title" id="sheetTitle">طماطم</p>
+    <p class="sheet-title" id="sheetTitle">جبن</p>
 
-    <div class="unit-toggle">
-      <button type="button" class="unit-btn active" data-unit="piece">بالعدد</button>
-      <button type="button" class="unit-btn" data-unit="kg">بالكيلو</button>
-    </div>
-
+    
     <div class="stepper">
       <button type="button" class="step-btn" id="decBtn">−</button>
       <div class="step-value" id="stepValue">1</div>
@@ -348,14 +186,13 @@
 <div class="toast" id="toast">تمت الإضافة إلى اللائحة</div>
 
 <script>
-  const vegetables = [
-    "طماطم", "بصل", "بطاطا", "خيار", "جزر", "فلفل",
-    "ثوم", "كوسة", "باذنجان", "فجل", "قرع", "سبانخ",
-    "خس",  "فاصوليا خضراء" 
-  ];
+  const ITEMS_JSON_URL = 'groceries_items.json';
+
+  let vegetables = [];       // flat list of all item names, in JSON order
+  let defaultUnitOf = {};    // name -> 'kg' | 'piece'
 
   const STORAGE_KEY = 'chrili-shopping-list';
-  const CATEGORY = 'خضر';
+  let CATEGORY = 'مواد غذائية';
 
   const listEl = document.getElementById('itemList');
   const overlay = document.getElementById('overlay');
@@ -365,7 +202,6 @@
   const decBtn = document.getElementById('decBtn');
   const incBtn = document.getElementById('incBtn');
   const addBtn = document.getElementById('addBtn');
-  const unitBtns = document.querySelectorAll('.unit-btn');
 
   let currentItem = null;
   let currentUnit = 'piece';
@@ -412,10 +248,10 @@
 
   function openSheet(name, existing){
     currentItem = name;
-    currentUnit = existing ? existing.unit : 'piece';
-    currentQty = existing ? existing.qty : 1;
+    currentUnit = defaultUnitOf[name] || 'piece';
+    currentQty = existing ? existing.qty : (currentUnit === 'kg' ? 0.5 : 1);
     sheetTitle.textContent = name;
-    updateUnitButtons();
+    updateUnitLabel();
     updateStepDisplay();
     overlay.classList.add('open');
   }
@@ -424,25 +260,13 @@
     overlay.classList.remove('open');
   }
 
-  function updateUnitButtons(){
-    unitBtns.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.unit === currentUnit);
-    });
+  function updateUnitLabel(){
     stepUnitLabel.textContent = currentUnit === 'kg' ? 'كيلوغرام' : 'قطعة';
   }
 
   function updateStepDisplay(){
     stepValue.textContent = currentUnit === 'kg' ? currentQty.toFixed(1) : currentQty;
   }
-
-  unitBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentUnit = btn.dataset.unit;
-      currentQty = currentUnit === 'kg' ? 0.5 : 1;
-      updateUnitButtons();
-      updateStepDisplay();
-    });
-  });
 
   decBtn.addEventListener('click', () => {
     const step = currentUnit === 'kg' ? 0.5 : 1;
@@ -484,7 +308,30 @@
     showToast(`${currentItem} — تمت الإضافة`);
   });
 
-  renderList();
+  async function loadItems(){
+    try{
+      const res = await fetch(ITEMS_JSON_URL);
+      const data = await res.json();
+
+      CATEGORY = data.category || CATEGORY;
+
+      const kgItems = data.kg || [];
+      const pieceItems = data.piece || [];
+
+      kgItems.forEach(name => { defaultUnitOf[name] = 'kg'; });
+      pieceItems.forEach(name => { defaultUnitOf[name] = 'piece'; });
+
+      // Keep kg items first, then piece items (edit groceries_items.json to change order/add items)
+      vegetables = [...kgItems, ...pieceItems];
+
+      renderList();
+    } catch(err){
+      console.error('Failed to load groceries_items.json', err);
+      listEl.innerHTML = '<p style="grid-column:1/-1; color:var(--ink-soft); text-align:center; padding:2rem 0;">تعذّر تحميل قائمة المواد. تأكد من وجود ملف groceries_items.json بجانب هذه الصفحة.</p>';
+    }
+  }
+
+  loadItems();
 </script>
 
 </body>

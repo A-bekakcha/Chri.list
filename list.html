@@ -135,6 +135,7 @@
   .item-info{ flex:1; min-width:0; }
   .item-name{ font-size:0.95rem; font-weight:600; }
   .item-qty{ font-size:0.8rem; color:var(--ink-soft); margin-top:1px; }
+  .item-note{ font-size:0.78rem; color:var(--amber-dark); margin-top:2px; font-style:italic; }
 
   .del-btn{
     width:32px;
@@ -252,6 +253,7 @@
             <div class="item-info">
               <div class="item-name">${entry.name}</div>
               <div class="item-qty">${unitLabel(entry)}</div>
+              ${entry.note ? `<div class="item-note">${entry.note}</div>` : ''}
             </div>
             <button type="button" class="del-btn" data-action="delete" aria-label="حذف">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m2 0-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 7"/></svg>
