@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>اللائحة — Chrili</title>
+<style>
+  :root{
+    --teal:#1D9E75;
+    --teal-dark:#0F6E56;
+    --teal-light:#E1F5EE;
+    --amber:#EF9F27;
+    --amber-dark:#854F0B;
+    --amber-light:#FAEEDA;
+    --blue:#378ADD;
+    --blue-dark:#0C447C;
+    --blue-light:#E6F1FB;
+    --bg:#FAFAF8;
+    --card-bg:#FFFFFF;
+    --ink:#22221F;
+    --ink-soft:#6B6A63;
+    --border:#E7E5DE;
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Segoe UI', 'Tahoma', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom:2rem;
+  }
+
+  header{
+    padding:1.1rem 1.25rem;
+    background:var(--card-bg);
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+  }
+
+  .back-btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    background:var(--blue-light);
+    color:var(--blue-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    flex-shrink:0;
+  }
+
+  .back-btn svg{ width:20px; height:20px; }
+
+  header h1{
+    font-size:1.1rem;
+    font-weight:700;
+    flex:1;
+  }
+
+  .count-badge{
+    background:var(--blue-light);
+    color:var(--blue-dark);
+    font-size:0.8rem;
+    font-weight:700;
+    padding:0.3rem 0.65rem;
+    border-radius:999px;
+  }
+
+  main{
+    padding:1rem 1.25rem;
+    max-width:520px;
+    margin:0 auto;
+  }
+
+  .category-group{ margin-bottom:1.4rem; }
+
+  .category-label{
+    font-size:0.85rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:0 0.25rem 0.6rem;
+  }
+
+  .list{
+    display:flex;
+    flex-direction:column;
+    gap:0.55rem;
+  }
+
+  .item-row{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:0.7rem 0.85rem;
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    transition:opacity 0.15s ease;
+  }
+
+  .item-row.checked{ opacity:0.45; }
+  .item-row.checked .item-name{ text-decoration:line-through; }
+
+  .check-btn{
+    width:26px;
+    height:26px;
+    border-radius:8px;
+    border:1.5px solid var(--border);
+    background:var(--bg);
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+  }
+
+  .check-btn.on{
+    background:var(--teal);
+    border-color:var(--teal);
+  }
+
+  .check-btn svg{ width:15px; height:15px; }
+
+  .item-info{ flex:1; min-width:0; }
+  .item-name{ font-size:0.95rem; font-weight:600; }
+  .item-qty{ font-size:0.8rem; color:var(--ink-soft); margin-top:1px; }
+
+  .del-btn{
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+
+  .del-btn svg{ width:18px; height:18px; }
+
+  .empty-state{
+    text-align:center;
+    padding:3rem 1.5rem;
+    color:var(--ink-soft);
+  }
+
+  .empty-state svg{ width:48px; height:48px; margin-bottom:0.85rem; opacity:0.5; }
+  .empty-state p{ font-size:0.92rem; margin-bottom:1rem; }
+
+  .empty-state a{
+    display:inline-block;
+    padding:0.6rem 1.1rem;
+    background:var(--teal);
+    color:#fff;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:0.88rem;
+    font-weight:700;
+  }
+
+  .clear-btn{
+    width:100%;
+    padding:0.75rem;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    border-radius:14px;
+    color:var(--ink-soft);
+    font-size:0.88rem;
+    font-weight:600;
+    font-family:inherit;
+    margin-top:0.5rem;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-btn" aria-label="رجوع">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 9 12l6 6"/></svg>
+  </a>
+  <h1>اللائحة</h1>
+  <span class="count-badge" id="countBadge">0</span>
+</header>
+
+<main id="main"></main>
+
+<script>
+  const STORAGE_KEY = 'chrili-shopping-list';
+  const main = document.getElementById('main');
+  const countBadge = document.getElementById('countBadge');
+
+  function getList(){
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  }
+
+  function saveList(list){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  function unitLabel(entry){
+    if(entry.unit === 'money') return `${entry.amount} دج`;
+    if(entry.unit === 'weight') return `${entry.weight} غ`;
+    if(entry.unit === 'kg') return `${entry.qty} كغ`;
+    return `${entry.qty} قطعة`;
+  }
+
+  function render(){
+    const list = getList();
+    countBadge.textContent = list.length;
+
+    if(list.length === 0){
+      main.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <p>اللائحة فارغة، زيد شي حاجة من الأقسام.</p>
+          <a href="index.html">رجوع للأقسام</a>
+        </div>
+      `;
+      return;
+    }
+
+    const groups = {};
+    list.forEach(entry => {
+      if(!groups[entry.category]) groups[entry.category] = [];
+      groups[entry.category].push(entry);
+    });
+
+    let html = '';
+    Object.keys(groups).forEach(category => {
+      html += `<div class="category-group"><p class="category-label">${category}</p><div class="list">`;
+      groups[category].forEach(entry => {
+        html += `
+          <div class="item-row ${entry.checked ? 'checked' : ''}" data-name="${entry.name}" data-category="${entry.category}">
+            <button type="button" class="check-btn ${entry.checked ? 'on' : ''}" data-action="check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <div class="item-info">
+              <div class="item-name">${entry.name}</div>
+              <div class="item-qty">${unitLabel(entry)}</div>
+            </div>
+            <button type="button" class="del-btn" data-action="delete" aria-label="حذف">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m2 0-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 7"/></svg>
+            </button>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+    });
+
+    html += `<button type="button" class="clear-btn" id="clearBtn">تفريغ اللائحة</button>`;
+
+    main.innerHTML = html;
+
+    main.querySelectorAll('[data-action="check"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const row = e.currentTarget.closest('.item-row');
+        toggleChecked(row.dataset.name, row.dataset.category);
+      });
+    });
+
+    main.querySelectorAll('[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const row = e.currentTarget.closest('.item-row');
+        deleteItem(row.dataset.name, row.dataset.category);
+      });
+    });
+
+    const clearBtn = document.getElementById('clearBtn');
+    if(clearBtn){
+      clearBtn.addEventListener('click', () => {
+        saveList([]);
+        render();
+      });
+    }
+  }
+
+  function toggleChecked(name, category){
+    const list = getList();
+    const entry = list.find(e => e.name === name && e.category === category);
+    if(entry){
+      entry.checked = !entry.checked;
+      saveList(list);
+      render();
+    }
+  }
+
+  function deleteItem(name, category){
+    let list = getList();
+    list = list.filter(e => !(e.name === name && e.category === category));
+    saveList(list);
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>

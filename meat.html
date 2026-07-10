@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>لحم — Chrili</title>
+<style>
+  :root{
+    --blue:#1D9E75;
+    --blue-dark:#0F6E56;
+    --blue-light:#E1F5EE;
+    --amber:#EF9F27;
+    --amber-dark:#854F0B;
+    --amber-light:#FAEEDA;
+    --blue:#378ADD;
+    --blue-dark:#0C447C;
+    --blue-light:#E6F1FB;
+    --bg:#FAFAF8;
+    --card-bg:#FFFFFF;
+    --ink:#22221F;
+    --ink-soft:#6B6A63;
+    --border:#E7E5DE;
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Segoe UI', 'Tahoma', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom:2rem;
+  }
+
+  header{
+    padding:1.1rem 1.25rem;
+    background:var(--card-bg);
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:0.75rem;
+  }
+
+  .header-left{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+  }
+
+  .back-btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    background:var(--blue-light);
+    color:var(--blue-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    flex-shrink:0;
+  }
+
+  .back-btn svg{ width:20px; height:20px; }
+
+  .list-btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    background:var(--bg);
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    flex-shrink:0;
+    border:1px solid var(--border);
+  }
+
+  .list-btn svg{ width:19px; height:19px; }
+
+  header h1{
+    font-size:1.1rem;
+    font-weight:700;
+  }
+
+  main{
+    padding:1rem 1.25rem;
+    max-width:520px;
+    margin:0 auto;
+  }
+
+  .list{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:0.6rem;
+  }
+
+  .item-row{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:0.75rem 0.5rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:0.4rem;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    transition:transform 0.1s ease;
+    position:relative;
+  }
+
+  .item-row:active{ transform:scale(0.96); }
+
+  .item-row.in-list{
+    border-color:var(--blue);
+    background:var(--blue-light);
+  }
+
+  .item-icon{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:var(--blue-light);
+    color:var(--blue-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    font-size:1.05rem;
+    font-weight:700;
+  }
+
+  .item-info{ min-width:0; width:100%; }
+
+  .item-name{
+    font-size:0.82rem;
+    font-weight:600;
+    line-height:1.25;
+  }
+
+  .item-qty{
+    font-size:0.7rem;
+    color:var(--blue-dark);
+    font-weight:700;
+    margin-top:1px;
+    display:none;
+  }
+
+  .item-qty.show{ display:block; }
+
+  .check-badge{
+    position:absolute;
+    top:6px;
+    left:6px;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:var(--blue);
+    color:#fff;
+    display:none;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .check-badge.show{ display:flex; }
+  .check-badge svg{ width:10px; height:10px; }
+
+  /* toast */
+  .toast{
+    position:fixed;
+    bottom:1.5rem;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:0.7rem 1.2rem;
+    border-radius:999px;
+    font-size:0.85rem;
+    font-weight:600;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.2s ease, transform 0.2s ease;
+    z-index:60;
+    white-space:nowrap;
+  }
+
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  /* bottom sheet */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(34,34,31,0.45);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+  }
+
+  .overlay.open{ display:flex; }
+
+  .sheet{
+    background:var(--card-bg);
+    width:100%;
+    max-width:520px;
+    border-radius:22px 22px 0 0;
+    padding:1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
+  }
+
+  .sheet-title{
+    font-size:1.05rem;
+    font-weight:700;
+    margin-bottom:1.2rem;
+  }
+
+  .unit-toggle{
+    display:flex;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:4px;
+    gap:4px;
+  }
+
+  .unit-btn{
+    flex:1;
+    padding:0.55rem;
+    border:none;
+    background:transparent;
+    border-radius:9px;
+    font-family:inherit;
+    font-size:0.88rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+
+  .unit-btn.active{
+    background:var(--blue);
+    color:#fff;
+  }
+
+  .amount-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:0.6rem;
+    margin:1.4rem 0;
+  }
+
+  .amount-chip{
+    padding:0.85rem;
+    border:1px solid var(--border);
+    background:var(--bg);
+    border-radius:14px;
+    font-family:inherit;
+    font-size:1rem;
+    font-weight:700;
+    color:var(--ink);
+    cursor:pointer;
+    text-align:center;
+  }
+
+  .amount-chip.active{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#fff;
+  }
+
+  .stepper{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:1.25rem;
+    margin:1.4rem 0;
+  }
+
+  .step-btn{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    font-size:1.3rem;
+    font-weight:700;
+    color:var(--blue-dark);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .step-btn:active{ transform:scale(0.94); }
+
+  .step-value{
+    font-size:1.6rem;
+    font-weight:700;
+    min-width:70px;
+    text-align:center;
+  }
+
+  .step-unit-label{
+    text-align:center;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-top:-1rem;
+    margin-bottom:1.2rem;
+  }
+
+  .btn-add{
+    width:100%;
+    padding:0.85rem;
+    border:none;
+    border-radius:14px;
+    background:var(--blue);
+    color:#fff;
+    font-size:0.98rem;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+  }
+
+  .btn-add:active{ transform:scale(0.98); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="index.html" class="back-btn" aria-label="رجوع">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 9 12l6 6"/></svg>
+    </a>
+    <h1>لحم</h1>
+  </div>
+  <a href="list.html" class="list-btn" aria-label="اللائحة">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>
+  </a>
+</header>
+
+<main>
+  <div class="list" id="itemList"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <p class="sheet-title" id="sheetTitle">طماطم</p>
+
+    <div class="unit-toggle">
+      <button type="button" class="unit-btn active" data-unit="piece">بالعدد</button>
+      <button type="button" class="unit-btn" data-unit="kg">بالكيلو</button>
+      <button type="button" class="unit-btn" data-unit="money">بالمبلغ</button>
+    </div>
+
+    <div class="stepper" id="stepperBlock">
+      <button type="button" class="step-btn" id="decBtn">−</button>
+      <div class="step-value" id="stepValue">1</div>
+      <button type="button" class="step-btn" id="incBtn">+</button>
+    </div>
+    <p class="step-unit-label" id="stepUnitLabel">قطعة</p>
+
+    <div class="amount-grid" id="amountBlock" style="display:none;">
+      <button type="button" class="amount-chip" data-amount="1000">1000 دج</button>
+      <button type="button" class="amount-chip" data-amount="1500">1500 دج</button>
+      <button type="button" class="amount-chip" data-amount="2000">2000 دج</button>
+      <button type="button" class="amount-chip" data-amount="custom" id="customAmountChip">مبلغ آخر</button>
+    </div>
+
+    <button type="button" class="btn-add" id="addBtn">إضافة إلى اللائحة</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">تمت الإضافة إلى اللائحة</div>
+
+<script>
+  const vegetables = [
+    "لحم بقري", "لحم غنم", "دجاج", "لحم مفروم",
+    "كبدة", "سجق", "ديك رومي", "سمك"
+  ];
+
+  const STORAGE_KEY = 'chrili-shopping-list';
+  const CATEGORY = 'لحم';
+
+  const listEl = document.getElementById('itemList');
+  const overlay = document.getElementById('overlay');
+  const sheetTitle = document.getElementById('sheetTitle');
+  const stepValue = document.getElementById('stepValue');
+  const stepUnitLabel = document.getElementById('stepUnitLabel');
+  const decBtn = document.getElementById('decBtn');
+  const incBtn = document.getElementById('incBtn');
+  const addBtn = document.getElementById('addBtn');
+  const unitBtns = document.querySelectorAll('.unit-btn');
+  const stepperBlock = document.getElementById('stepperBlock');
+  const amountBlock = document.getElementById('amountBlock');
+  const amountChips = document.querySelectorAll('.amount-chip');
+  const customAmountChip = document.getElementById('customAmountChip');
+
+  let currentAmount = 1000;
+
+  let currentItem = null;
+  let currentUnit = 'piece';
+  let currentQty = 1;
+
+  function initial(name){ return name.trim().charAt(0); }
+
+  function renderList(){
+    listEl.innerHTML = '';
+    const saved = getSavedQuantities();
+    vegetables.forEach(name => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.dataset.name = name;
+
+      const savedEntry = saved[name];
+      let qtyText = '';
+      if(savedEntry){
+        if(savedEntry.unit === 'money') qtyText = `${savedEntry.amount} دج`;
+        else if(savedEntry.unit === 'kg') qtyText = `${savedEntry.qty} كغ`;
+        else qtyText = `${savedEntry.qty} قطعة`;
+      }
+
+      row.innerHTML = `
+        <div class="check-badge ${savedEntry ? 'show' : ''}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div class="item-icon">${initial(name)}</div>
+        <div class="item-info">
+          <div class="item-name">${name}</div>
+          <div class="item-qty ${savedEntry ? 'show' : ''}">${qtyText}</div>
+        </div>
+      `;
+
+      if(savedEntry) row.classList.add('in-list');
+      row.addEventListener('click', () => openSheet(name, savedEntry));
+      listEl.appendChild(row);
+    });
+  }
+
+  function getSavedQuantities(){
+    const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const map = {};
+    list.forEach(entry => {
+      if(entry.category === CATEGORY) map[entry.name] = entry;
+    });
+    return map;
+  }
+
+  function openSheet(name, existing){
+    currentItem = name;
+    currentUnit = existing ? existing.unit : 'piece';
+    currentQty = existing && existing.unit !== 'money' ? existing.qty : 1;
+    currentAmount = existing && existing.unit === 'money' ? existing.amount : 1000;
+    sheetTitle.textContent = name;
+    updateUnitButtons();
+    updateStepDisplay();
+    updateAmountChips();
+    overlay.classList.add('open');
+  }
+
+  function closeSheet(){
+    overlay.classList.remove('open');
+  }
+
+  function updateUnitButtons(){
+    unitBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.unit === currentUnit);
+    });
+    stepUnitLabel.textContent = currentUnit === 'kg' ? 'كيلوغرام' : 'قطعة';
+
+    if(currentUnit === 'money'){
+      stepperBlock.style.display = 'none';
+      stepUnitLabel.style.display = 'none';
+      amountBlock.style.display = 'grid';
+    } else {
+      stepperBlock.style.display = 'flex';
+      stepUnitLabel.style.display = 'block';
+      amountBlock.style.display = 'none';
+    }
+  }
+
+  function updateStepDisplay(){
+    stepValue.textContent = currentUnit === 'kg' ? currentQty.toFixed(1) : currentQty;
+  }
+
+  function updateAmountChips(){
+    amountChips.forEach(chip => {
+      const amt = chip.dataset.amount;
+      chip.classList.toggle('active', amt !== 'custom' && Number(amt) === currentAmount);
+    });
+    if(![1000, 1500, 2000].includes(currentAmount)){
+      customAmountChip.textContent = `${currentAmount} دج`;
+      customAmountChip.classList.add('active');
+    } else {
+      customAmountChip.textContent = 'مبلغ آخر';
+    }
+  }
+
+  amountChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      if(chip.dataset.amount === 'custom'){
+        const value = prompt('دخل المبلغ بالدج:', currentAmount);
+        const num = parseInt(value, 10);
+        if(!isNaN(num) && num > 0) currentAmount = num;
+      } else {
+        currentAmount = Number(chip.dataset.amount);
+      }
+      updateAmountChips();
+    });
+  });
+
+  unitBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentUnit = btn.dataset.unit;
+      if(currentUnit === 'kg') currentQty = 0.5;
+      else if(currentUnit === 'piece') currentQty = 1;
+      updateUnitButtons();
+      updateStepDisplay();
+      updateAmountChips();
+    });
+  });
+
+  decBtn.addEventListener('click', () => {
+    const step = currentUnit === 'kg' ? 0.5 : 1;
+    const min = currentUnit === 'kg' ? 0.5 : 1;
+    currentQty = Math.max(min, currentQty - step);
+    updateStepDisplay();
+  });
+
+  incBtn.addEventListener('click', () => {
+    const step = currentUnit === 'kg' ? 0.5 : 1;
+    currentQty = currentQty + step;
+    updateStepDisplay();
+  });
+
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) closeSheet(); });
+
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
+
+  function showToast(message){
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+
+  addBtn.addEventListener('click', () => {
+    const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const existingIndex = list.findIndex(e => e.name === currentItem && e.category === CATEGORY);
+    const entry = currentUnit === 'money'
+      ? { name: currentItem, category: CATEGORY, unit: 'money', amount: currentAmount, addedAt: Date.now() }
+      : { name: currentItem, category: CATEGORY, unit: currentUnit, qty: currentQty, addedAt: Date.now() };
+    if(existingIndex > -1){
+      list[existingIndex] = entry;
+    } else {
+      list.push(entry);
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    closeSheet();
+    renderList();
+    showToast(`${currentItem} — تمت الإضافة`);
+  });
+
+  renderList();
+</script>
+
+</body>
+</html>
