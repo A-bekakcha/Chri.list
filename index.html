@@ -1,496 +1,344 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>Chrili</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Chrili-list</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@500;700;800&display=swap">
 <style>
-  :root{
-    --teal:#1D9E75;
-    --teal-dark:#0F6E56;
-    --teal-light:#E1F5EE;
-    --amber:#EF9F27;
-    --amber-dark:#854F0B;
-    --amber-light:#FAEEDA;
-    --blue:#378ADD;
-    --blue-dark:#0C447C;
-    --blue-light:#E6F1FB;
-    --bg:#FAFAF8;
-    --card-bg:#FFFFFF;
-    --ink:#22221F;
-    --ink-soft:#6B6A63;
-    --border:#E7E5DE;
-    --radius:18px;
-  }
+/* Layout: a retro file cabinet. Two-column grid of folders (teal tab, hard black offset shadow, paper sheet peeking out the back),
+   a hand-drawn sticker inside each one, cart and shopping-list buttons pinned to the top corners exactly as in the wireframe.
+   Single look by choice: flat paper, black ink, one teal. */
+:root {
+  --paper: #efeeec;
+  --ink: #0a0a0a;
+  --teal: #00bfa5;
+  --mint: #d9f5ee;
+  --cream: #fffbe8;
+  --white: #ffffff;
+  --danger: #a3211b;
+  --f-display: 'Lalezar', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+  --f-body: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: radial-gradient(rgba(10, 10, 10, 0.1) 1px, transparent 1.2px);
+  background-size: 14px 14px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 44px;
+  min-height: 100vh;
+}
+.app { max-width: 440px; margin: 0 auto; }
 
-  *{box-sizing:border-box; margin:0; padding:0;}
+.top { direction: ltr; display: flex; justify-content: space-between; padding: 8px 10px 0; }
+.icon-btn {
+  position: relative; width: 46px; height: 46px; display: grid; place-items: center; padding: 0;
+  background: var(--white); border: 2px solid var(--ink); border-radius: 8px; box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer; transition: translate 0.08s, box-shadow 0.08s; -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+.icon-btn:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px; }
+.icon-btn svg { width: 26px; height: 26px; }
+.badge {
+  position: absolute; top: -10px; min-width: 22px; height: 22px; padding: 0 5px;
+  background: var(--teal); color: var(--ink); border: 2px solid var(--ink); border-radius: 11px;
+  font: 800 12px/18px var(--f-body); text-align: center;
+}
+.badge.r { right: -10px; }
+.badge.l { left: -10px; }
 
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Segoe UI', 'Tahoma', 'Helvetica Neue', Arial, sans-serif;
-    -webkit-font-smoothing:antialiased;
-    min-height:100vh;
-    padding-bottom:2rem;
-  }
+/* heading */
+.heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 26px; }
+h1 {
+  margin: 0; font: 400 38px/1.15 var(--f-display); padding-inline: 6px;
+  background-image: linear-gradient(transparent 60%, var(--teal) 60% 92%, transparent 92%);
+}
+.count {
+  font: 800 13px/1 var(--f-body); padding: 7px 11px; background: var(--white);
+  border: 2px solid var(--ink); border-radius: 999px; white-space: nowrap;
+}
+.lead { margin: 10px 6px 0; font: 500 15px/1.6 var(--f-body); color: #3b3a38; }
 
-  header{
-    padding:1.75rem 1.25rem 1.25rem;
-    background:linear-repeat, var(--card-bg);
-    background:var(--card-bg);
-    border-bottom:1px solid var(--border);
-    position:sticky;
-    top:0;
-    z-index:10;
-  }
+/* folders */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; margin-top: 24px; }
+.folder {
+  position: relative; display: block; width: 100%; padding: 20px 0 0; border: 0; background: none;
+  font: inherit; color: inherit; text-align: right; cursor: pointer; isolation: isolate;
+  transition: translate 0.08s; -webkit-tap-highlight-color: transparent;
+}
+.folder:active { translate: 3px 3px; }
+.folder:active .card { box-shadow: 1px 1px 0 var(--ink); }
+.folder:focus-visible { outline: 3px dashed var(--ink); outline-offset: 5px; border-radius: 12px; }
+.tab {
+  position: absolute; left: 12px; top: 0; width: 56%; height: 20px; z-index: 2;
+  display: grid; place-items: center; background: var(--teal);
+  border: 2px solid var(--ink); border-bottom: 0; border-radius: 9px 9px 0 0; box-shadow: 3px 0 0 var(--ink);
+}
+.tabtxt { font: 800 11px/1 var(--f-body); white-space: nowrap; }
+.paper {
+  position: absolute; right: 14px; top: 9px; width: 26%; height: 26px; z-index: 0;
+  background: var(--cream); border: 2px solid var(--ink); border-radius: 5px; rotate: 3deg; transition: translate 0.18s;
+}
+.card {
+  position: relative; z-index: 1; display: flex; flex-direction: column; height: 128px; padding: 6px 10px 9px;
+  background: var(--white); border: 2px solid var(--ink); border-radius: 4px 12px 12px 12px; box-shadow: 4px 4px 0 var(--ink);
+  transition: box-shadow 0.08s;
+}
+.art { flex: 1; min-height: 0; display: grid; place-items: center; }
+.art svg { width: 100%; height: 78px; overflow: visible; rotate: -2deg; transition: translate 0.18s, rotate 0.18s; }
+.folder:nth-child(even) .art svg { rotate: 2deg; }
+@media (hover: hover) {
+  .folder:hover .art svg { translate: 0 -6px; rotate: -5deg; }
+  .folder:hover .paper { translate: 0 -5px; }
+}
+.row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.name { min-width: 0; font: 400 21px/1.1 var(--f-display); overflow-wrap: anywhere; }
+.go { flex: none; width: 24px; height: 24px; }
+.folder.add .card { background: var(--mint); border-style: dashed; }
+.folder.fresh .card { animation: drop 0.35s ease-out; }
+@keyframes drop { from { translate: 0 -10px; opacity: 0; } to { translate: 0 0; opacity: 1; } }
 
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:0.65rem;
-  }
+/* add sheet */
+.scrim { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; background: rgba(10, 10, 10, 0.5); }
+.sheet {
+  width: 100%; max-width: 440px; display: grid; gap: 14px; background: var(--cream);
+  border: 2px solid var(--ink); border-bottom: 0; border-radius: 16px 16px 0 0;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.sheet h2 { margin: 0; font: 400 28px/1.2 var(--f-display); }
+.sheet label { font: 800 14px/1 var(--f-body); }
+.field {
+  width: 100%; margin-top: 8px; padding: 12px 14px; background: var(--white); color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 8px; font: 500 16px/1.4 var(--f-body);
+}
+.field:focus { outline: none; box-shadow: 3px 3px 0 var(--teal); }
+.err { margin: 0; min-height: 1.2em; font: 700 14px/1.4 var(--f-body); color: var(--danger); }
+.actions { display: flex; gap: 12px; }
+.btn {
+  flex: 1; padding: 13px 16px; background: var(--white); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px;
+  box-shadow: 3px 3px 0 var(--ink); font: 800 16px/1 var(--f-body); cursor: pointer; transition: translate 0.08s, box-shadow 0.08s;
+}
+.btn.primary { background: var(--teal); flex: 2; }
+.btn:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+.btn:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
 
-  .brand-mark{
-    width:42px;
-    height:42px;
-    border-radius:12px;
-    background:var(--teal);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-  }
-
-  .brand-mark svg{ width:24px; height:24px; }
-
-  .brand-text h1{
-    font-size:1.35rem;
-    font-weight:700;
-    letter-spacing:0.2px;
-  }
-
-  .brand-text p{
-    font-size:0.8rem;
-    color:var(--ink-soft);
-    margin-top:1px;
-  }
-
-  .header-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:0.75rem;
-  }
-
-  .list-btn{
-    width:42px;
-    height:42px;
-    border-radius:12px;
-    background:var(--amber-light);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    color:var(--amber-dark);
-    text-decoration:none;
-    -webkit-tap-highlight-color:transparent;
-    transition:transform 0.12s ease;
-  }
-
-  .list-btn:active{ transform:scale(0.94); }
-
-  .list-btn svg{ width:22px; height:22px; }
-
-  main{
-    padding:1.25rem;
-    max-width:520px;
-    margin:0 auto;
-  }
-
-  .section-label{
-    font-size:0.95rem;
-    font-weight:700;
-    color:var(--ink);
-    margin:0.5rem 0.25rem 0.85rem;
-  }
-
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:0.85rem;
-  }
-
-  .card{
-    background:var(--card-bg);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    overflow:hidden;
-    text-decoration:none;
-    color:inherit;
-    display:flex;
-    flex-direction:column;
-    -webkit-tap-highlight-color:transparent;
-    transition:transform 0.12s ease;
-  }
-
-  .card:active{
-    transform:scale(0.97);
-  }
-
-  .card-image{
-    aspect-ratio:1.3 / 1;
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-  }
-
-  .card-image img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
-
-  .card-image .placeholder-icon{
-    opacity:0.55;
-  }
-
-  .card-image .placeholder-icon svg{
-    width:30px;
-    height:30px;
-  }
-
-  .card-title{
-    padding:0.65rem 0.75rem 0.8rem;
-    font-size:0.92rem;
-    font-weight:600;
-    line-height:1.3;
-  }
-
-  /* three-color rotation for card image backgrounds */
-  .card:nth-child(3n+1) .card-image{ background:var(--teal-light); }
-  .card:nth-child(3n+1) .placeholder-icon{ color:var(--teal-dark); }
-
-  .card:nth-child(3n+2) .card-image{ background:var(--amber-light); }
-  .card:nth-child(3n+2) .placeholder-icon{ color:var(--amber-dark); }
-
-  .card:nth-child(3n+3) .card-image{ background:var(--blue-light); }
-  .card:nth-child(3n+3) .placeholder-icon{ color:var(--blue-dark); }
-
-  .add-card{
-    background:var(--card-bg);
-    border:1.5px dashed var(--border);
-    border-radius:var(--radius);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    aspect-ratio:1.3/1;
-    color:var(--ink-soft);
-    gap:0.4rem;
-    grid-column:1 / -1;
-    padding:1.4rem;
-    text-decoration:none;
-  }
-
-  .add-card svg{ width:26px; height:26px; }
-
-  .add-card span{ font-size:0.85rem; font-weight:600; }
-
-  footer{
-    text-align:center;
-    padding:1.5rem 1rem 0.5rem;
-    font-size:0.75rem;
-    color:var(--ink-soft);
-  }
-
-  /* add-category overlay */
-  .overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(34,34,31,0.45);
-    display:none;
-    align-items:flex-end;
-    justify-content:center;
-    z-index:50;
-  }
-
-  .overlay.open{ display:flex; }
-
-  .add-panel{
-    background:var(--card-bg);
-    width:100%;
-    max-width:520px;
-    border-radius:22px 22px 0 0;
-    padding:1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
-  }
-
-  .add-panel-title{
-    font-size:1.05rem;
-    font-weight:700;
-    margin-bottom:1.1rem;
-  }
-
-  .field-label{
-    display:block;
-    font-size:0.82rem;
-    font-weight:600;
-    color:var(--ink-soft);
-    margin:0.9rem 0 0.4rem;
-  }
-
-  .field-input{
-    width:100%;
-    padding:0.7rem 0.85rem;
-    border:1px solid var(--border);
-    border-radius:12px;
-    font-size:0.95rem;
-    font-family:inherit;
-    background:var(--bg);
-    color:var(--ink);
-  }
-
-  .field-input:focus{
-    outline:none;
-    border-color:var(--teal);
-  }
-
-  .panel-actions{
-    display:flex;
-    gap:0.75rem;
-    margin-top:1.4rem;
-  }
-
-  .btn-cancel, .btn-save{
-    flex:1;
-    padding:0.75rem;
-    border-radius:12px;
-    font-size:0.92rem;
-    font-weight:700;
-    font-family:inherit;
-    border:none;
-    cursor:pointer;
-  }
-
-  .btn-cancel{
-    background:var(--bg);
-    color:var(--ink-soft);
-    border:1px solid var(--border);
-  }
-
-  .btn-save{
-    background:var(--teal);
-    color:#fff;
-  }
-
-  .btn-save:active, .btn-cancel:active{
-    transform:scale(0.97);
-  }
-
-  .toast{
-    position:fixed;
-    bottom:1.5rem;
-    left:50%;
-    transform:translateX(-50%) translateY(20px);
-    background:var(--ink);
-    color:#fff;
-    padding:0.7rem 1.2rem;
-    border-radius:999px;
-    font-size:0.85rem;
-    font-weight:600;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity 0.2s ease, transform 0.2s ease;
-    z-index:60;
-    white-space:nowrap;
-  }
-
-  .toast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-  }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
 </style>
-</head>
-<body>
 
-<header>
-  <div class="header-row">
-    <div class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
-          <path d="M3 6h18"/>
-          <path d="M16 10a4 4 0 0 1-8 0"/>
-        </svg>
-      </div>
-      <div class="brand-text">
-        <h1>Chrili</h1>
-      </div>
-    </div>
-
-    <a href="list.html" class="list-btn" aria-label="لائحة المنتجات">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 6h11M9 12h11M9 18h11"/>
-        <path d="M4 6h.01M4 12h.01M4 18h.01"/>
+<div class="app" dir="rtl" lang="ar">
+  <header class="top">
+    <button class="icon-btn" type="button" aria-label="السلة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2.5 4h3l2.2 10.2h10.2L20.6 7H6.4"/><path d="M9 10h10M9.6 12.4H18"/><circle cx="9.4" cy="18.6" r="1.5"/><circle cx="17.2" cy="18.6" r="1.5"/>
       </svg>
-    </a>
-  </div>
-</header>
+      <span class="badge r"></span>
+    </button>
+    <button class="icon-btn" type="button" aria-label="قائمة التسوق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4.5" y="4.5" width="15" height="17" rx="2.2"/><rect x="8.5" y="2.5" width="7" height="4" rx="1.2" fill="#fff"/>
+        <path d="M8 11l1.2 1.2L11.4 10M13.4 11.4H16M8 16.4l1.2 1.2 2.2-2.2M13.4 16.8H16"/>
+      </svg>
+      <span class="badge l"></span>
+    </button>
+  </header>
 
-<main>
-  <p class="section-label">الأقسام</p>
+  <main class="grid" id="grid"></main>
 
-  <div class="grid">
-
-    <a href="vegetables.html" class="card">
-      <div class="card-image">
-        <img src="https://cdn.britannica.com/17/196817-050-6A15DAC3/vegetables.jpg?w=400&h=300&c=crop" alt="خضر">
+  <div class="scrim" id="scrim" hidden>
+    <form class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" novalidate>
+      <h2 id="sheetTitle">قسم جديد</h2>
+      <div>
+        <label for="catName">اسم القسم</label>
+        <input class="field" id="catName" type="text" maxlength="18" autocomplete="off" placeholder="مثال: مشروبات">
       </div>
-      <div class="card-title">خضر</div>
-    </a>
-
-    <a href="fruits.html" class="card">
-      <div class="card-image">
-        <img src="https://new-server.developingexperts.com/file-cdn/images/get/10327817-17cf-4578-97e1-704cbadb8a01?transform=resize:340x_~fit:contain;format:webp;quality:80" alt="فواكه">
+      <p class="err" id="err" role="alert"></p>
+      <div class="actions">
+        <button class="btn primary" type="submit">إضافة القسم</button>
+        <button class="btn" type="button" id="cancel">إلغاء</button>
       </div>
-      <div class="card-title">فواكه</div>
-    </a>
-
-    <a href="meat.html" class="card">
-      <div class="card-image">
-        <img src="https://cdn.britannica.com/72/143572-050-87DF1262/pork-butcher-shop-Hong-Kong.jpg" alt="لحم">
-      </div>
-      <div class="card-title">لحم</div>
-    </a>
-
-    <a href="groceries.html" class="card">
-      <div class="card-image">
-        <img src="https://www.sciencesetavenir.fr/assets/img/2018/04/12/cover-r4x3w1200-5acf35a316a27-des-additifs-dans-nos-yaourts.jpg" alt="مواد غذائية">
-      </div>
-      <div class="card-title">مواد غذائية</div>
-    </a>
-
-    <a href="spices.html" class="card">
-      <div class="card-image">
-        <img src="https://nyspiceshop.com/cdn/shop/articles/SPICES_VS._SEASONING.jpeg?v=1568991269" alt="عطار">
-      </div>
-      <div class="card-title">عطار</div>
-    </a>
-
-    <a href="cleaning.html" class="card">
-      <div class="card-image">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb67256nlsyabOCZ8KqIWoLm4LK-iqXU70BHG3jqZciRvmSw8yTvem2GU&s=10" alt="منتجات التنظيف">
-      </div>
-      <div class="card-title">منتجات التنظيف</div>
-    </a>
-
-    <a href="#" id="addProductBtn" class="card" aria-label="اضافة منتج">
-      <div class="card-image">
-        <span class="placeholder-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="36" height="36" aria-hidden="true">
-  <path d="M12 5v14M5 12h14"/>
-</svg>
-        </span>
-      </div>
-      <div class="card-title">اضافة</div>
-    </a>
-
-    <a href="bakery.html" class="card">
-      <div class="card-image">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Korb_mit_Br%C3%B6tchen.JPG/1280px-Korb_mit_Br%C3%B6tchen.JPG" alt="خبز">
-      </div>
-      <div class="card-title">خبز</div>
-    </a>
-
-  </div>
-</main>
-
-<div class="overlay" id="overlay">
-  <div class="add-panel">
-    <p class="add-panel-title">إضافة منتج</p>
-
-    <label class="field-label" for="productName">اسم المنتج</label>
-    <input type="text" id="productName" class="field-input" >
-
-    <label class="field-label" for="productNote">ملاحظة</label>
-    <input type="text" id="productNote" class="field-input" placeholder="مثال: بدون سكر">
-
-    <div class="panel-actions">
-      <button type="button" class="btn-cancel" id="cancelBtn">إلغاء</button>
-      <button type="button" class="btn-save" id="saveBtn">إضافة إلى اللائحة</button>
-    </div>
+    </form>
   </div>
 </div>
 
-<div class="toast" id="toast">تمت الإضافة إلى اللائحة</div>
-
 <script>
-  const addProductBtn = document.getElementById('addProductBtn');
-  const overlay = document.getElementById('overlay');
-  const cancelBtn = document.getElementById('cancelBtn');
-  const saveBtn = document.getElementById('saveBtn');
-  const productName = document.getElementById('productName');
-  const productNote = document.getElementById('productNote');
-  const toast = document.getElementById('toast');
+(function () {
+  var O = '<svg viewBox="0 0 120 80" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">';
+  var C = '</svg>';
 
-  const LIST_STORAGE_KEY = 'chrili-shopping-list';
-  const CATEGORY = 'أخرى';
+  var ART = {
+    /* خضر: carrot with leafy top and a tomato */
+    veg: O +
+      '<g transform="translate(50 28) rotate(38)">' +
+        '<path d="M-3 0 C-14 -10 -12 -22 -8 -24 C-5 -16 -3 -10 -1 -3 Z" fill="#4fc26b"/>' +
+        '<path d="M3 0 C14 -10 12 -22 8 -24 C5 -16 3 -10 1 -3 Z" fill="#4fc26b"/>' +
+        '<path d="M0 0 C-3 -12 0 -26 0 -28 C3 -20 3 -10 2 0 Z" fill="#4fc26b"/>' +
+        '<path d="M-10 0 Q0 -5 10 0 L1 48 Q0 50 -1 48 Z" fill="#ff8a3d"/>' +
+        '<path d="M-6 12 H-1 M3 24 H7 M-3 35 H1" stroke-width="2"/>' +
+      '</g>' +
+      '<circle cx="94" cy="46" r="18" fill="#ff5a4d"/>' +
+      '<path d="M82 32 L90 36 L94 28 L98 36 L106 32 L100 40 H88 Z" fill="#4fc26b"/>' +
+      '<path d="M84 50 Q83 43 89 39" stroke="#fff" stroke-width="3"/>' + C,
 
-  let toastTimer = null;
+    /* فواكه: orange slice and a strawberry */
+    fruit: O +
+      '<circle cx="38" cy="42" r="26" fill="#ff8a3d"/>' +
+      '<circle cx="38" cy="42" r="20" fill="#ffe0a3" stroke-width="2"/>' +
+      '<path d="M38 42 L58 42 M38 42 L52 56 M38 42 L38 62 M38 42 L24 56 M38 42 L18 42 M38 42 L24 28 M38 42 L38 22 M38 42 L52 28" stroke="#ff8a3d" stroke-width="3"/>' +
+      '<circle cx="38" cy="42" r="4" fill="#ffe0a3" stroke="none"/>' +
+      '<path d="M92 30 Q112 28 108 48 Q104 66 92 72 Q80 66 76 48 Q72 28 92 30 Z" fill="#ff5a4d"/>' +
+      '<path d="M80 29 L92 35 L104 29 L99 38 L92 34 L85 38 Z" fill="#4fc26b"/>' +
+      '<g fill="#ffd23f" stroke="none"><circle cx="86" cy="48" r="1.8"/><circle cx="98" cy="48" r="1.8"/><circle cx="92" cy="57" r="1.8"/><circle cx="84" cy="59" r="1.8"/><circle cx="100" cy="59" r="1.8"/></g>' + C,
 
-  function showToast(message){
-    toast.textContent = message;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+    /* لحم: T-bone steak */
+    meat: O +
+      '<path d="M16 42 Q12 20 40 16 Q72 10 96 24 Q112 38 100 54 Q84 70 52 66 Q20 66 16 42 Z" fill="#ff6b78"/>' +
+      '<path d="M28 30 Q40 24 52 30 M68 22 Q82 26 90 36 M28 48 Q38 54 48 52" stroke="#ffd7dc" stroke-width="3"/>' +
+      '<path d="M44 28 H78 V38 H66 V56 H56 V38 H44 Z" fill="#fff8e6"/>' + C,
+
+    /* مواد غذائية: tin can and a cereal box */
+    pantry: O +
+      '<g transform="rotate(6 83 41)"><rect x="62" y="14" width="42" height="54" rx="3" fill="#ff5a4d"/>' +
+      '<circle cx="83" cy="34" r="11" fill="#ffd23f"/><rect x="70" y="51" width="26" height="8" rx="2" fill="#fff8e6"/></g>' +
+      '<path d="M14 26 V62 Q32 72 50 62 V26" fill="#4aa3ff"/>' +
+      '<ellipse cx="32" cy="26" rx="18" ry="6" fill="#d9ecff"/>' +
+      '<path d="M14 39 Q32 46 50 39 V52 Q32 59 14 52 Z" fill="#ffd23f"/>' + C,
+
+    /* عطار: spice jar, star anise and a chili */
+    spice: O +
+      '<rect x="22" y="12" width="36" height="12" rx="3" fill="#c98b5a"/>' +
+      '<path d="M24 24 H56 Q62 28 62 36 V62 Q62 70 54 70 H26 Q18 70 18 62 V36 Q18 28 24 24 Z" fill="#fff8e6"/>' +
+      '<path d="M18 52 H62 V62 Q62 70 54 70 H26 Q18 70 18 62 Z" fill="#ff8a3d"/>' +
+      '<rect x="26" y="33" width="28" height="14" rx="2" fill="#ffd23f"/><path d="M31 40 H49" stroke-width="2"/>' +
+      '<g transform="translate(92 30)" fill="#a35a2c">' +
+        '<ellipse rx="4.5" ry="15"/><ellipse rx="4.5" ry="15" transform="rotate(45)"/>' +
+        '<ellipse rx="4.5" ry="15" transform="rotate(90)"/><ellipse rx="4.5" ry="15" transform="rotate(135)"/>' +
+        '<circle r="4" fill="#5a2f14"/>' +
+      '</g>' +
+      '<path d="M76 60 Q94 54 110 66 Q96 76 82 70 Q74 66 76 60 Z" fill="#ff5a4d"/>' +
+      '<path d="M76 60 Q71 55 75 51" stroke-width="3"/>' + C,
+
+    /* منتجات التنظيف: spray bottle, soap bubbles, sparkle */
+    clean: O +
+      '<rect x="22" y="32" width="32" height="38" rx="7" fill="#4aa3ff"/>' +
+      '<rect x="32" y="22" width="12" height="10" fill="#fff8e6"/>' +
+      '<path d="M26 12 H50 L58 18 V24 H30 Q26 24 26 20 Z" fill="#ff5a4d"/>' +
+      '<rect x="28" y="44" width="20" height="14" rx="2" fill="#fff8e6"/>' +
+      '<g fill="#d9ecff"><circle cx="80" cy="22" r="10"/><circle cx="98" cy="40" r="7"/><circle cx="82" cy="54" r="8"/><circle cx="108" cy="16" r="4"/></g>' +
+      '<g stroke="#fff" stroke-width="2"><path d="M75 19 Q77 16 80 16"/><path d="M95 38 Q96 36 98 36"/><path d="M78 52 Q79 49 82 49"/></g>' +
+      '<path d="M104 62 L106 68 L112 70 L106 72 L104 78 L102 72 L96 70 L102 68 Z" fill="#ffd23f"/>' + C,
+
+    /* خبز: round loaf with scoring and a baguette behind it */
+    bread: O +
+      '<g transform="rotate(-28 90 36)"><rect x="64" y="28" width="52" height="16" rx="8" fill="#e9a959"/>' +
+      '<path d="M76 31 L80 41 M88 31 L92 41 M100 31 L104 41" stroke-width="2"/></g>' +
+      '<path d="M14 56 Q10 30 38 26 Q68 24 72 52 Q74 68 44 70 Q18 72 14 56 Z" fill="#f2b765"/>' +
+      '<path d="M28 37 Q32 44 28 54 M42 33 Q46 42 42 55 M56 37 Q60 44 56 54" stroke="#fff8e6" stroke-width="4"/>' + C,
+
+    /* اضافة: chunky plus with a printed shadow */
+    add: O +
+      '<path transform="translate(3 3)" d="M52 14 H68 V32 H86 V48 H68 V66 H52 V48 H34 V32 H52 Z" fill="#0a0a0a"/>' +
+      '<path d="M52 14 H68 V32 H86 V48 H68 V66 H52 V48 H34 V32 H52 Z" fill="#00bfa5"/>' + C,
+
+    /* new category: price tag */
+    tag: O +
+      '<path d="M14 20 Q14 14 20 14 H64 L104 40 L64 66 H20 Q14 66 14 60 Z" fill="#ffd23f"/>' +
+      '<circle cx="30" cy="40" r="5" fill="#efeeec"/>' +
+      '<path d="M46 32 H72 M46 44 H64" stroke-width="3"/>' + C
+  };
+
+  var CHEV = '<svg class="go" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#0a0a0a"/>' +
+    '<path d="M13.5 7.5 9 12l4.5 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  /* order matches the original page when read right to left */
+  var CATS = [
+    ['veg', 'خضر', '٣٦ منتج'],
+    ['fruit', 'فواكه', '٢٨ منتج'],
+    ['meat', 'لحم', '١٤ منتج'],
+    ['pantry', 'مواد غذائية', '٨٢ منتج'],
+    ['spice', 'عطار', '٣١ منتج'],
+    ['clean', 'منتجات التنظيف', '٢٢ منتج'],
+    ['add', 'اضافة', 'جديد'],
+    ['bread', 'خبز', '٩ منتجات']
+  ];
+
+  var grid = document.getElementById('grid');
+  var countEl = document.getElementById('count');
+  var scrim = document.getElementById('scrim');
+  var form = document.getElementById('sheet');
+  var input = document.getElementById('catName');
+  var err = document.getElementById('err');
+  var addBtn = null;
+  var lastFocus = null;
+  var names = [];
+
+  function toAr(n) { return String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }); }
+
+  function makeFolder(key, name, tabText, extra) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'folder' + (extra ? ' ' + extra : '');
+    b.setAttribute('aria-label', name);
+    b.innerHTML =
+      '<span class="paper" aria-hidden="true"></span>' +
+      '<span class="tab"><span class="tabtxt"></span></span>' +
+      '<span class="card"><span class="art">' + ART[key] + '</span>' +
+      '<span class="row"><span class="name"></span>' + CHEV + '</span></span>';
+    b.querySelector('.tabtxt').textContent = tabText;
+    b.querySelector('.name').textContent = name;
+    return b;
   }
 
-  function openPanel(){
-    overlay.classList.add('open');
-    productName.value = '';
-    productNote.value = '';
-    setTimeout(() => productName.focus(), 50);
+  function updateCount() {
+    var n = names.length;
+    countEl.textContent = toAr(n) + (n <= 10 ? ' أقسام' : ' قسماً');
   }
 
-  function closePanel(){
-    overlay.classList.remove('open');
-  }
-
-  addProductBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    openPanel();
-  });
-
-  cancelBtn.addEventListener('click', closePanel);
-  overlay.addEventListener('click', (e) => { if(e.target === overlay) closePanel(); });
-
-  function addProductToList(){
-    const name = productName.value.trim();
-    if(!name){ productName.focus(); return; }
-    const note = productNote.value.trim();
-
-    const list = JSON.parse(localStorage.getItem(LIST_STORAGE_KEY) || '[]');
-    const existingIndex = list.findIndex(e => e.name === name && e.category === CATEGORY);
-    const entry = { name, category: CATEGORY, qty: 1, unit: 'piece', note: note || undefined, addedAt: Date.now() };
-    if(existingIndex > -1){
-      list[existingIndex] = entry;
+  CATS.forEach(function (c) {
+    if (c[0] === 'add') {
+      addBtn = makeFolder('add', c[1], c[2], 'add');
+      addBtn.addEventListener('click', openSheet);
+      grid.appendChild(addBtn);
     } else {
-      list.push(entry);
+      names.push(c[1]);
+      grid.appendChild(makeFolder(c[0], c[1], c[2]));
     }
-    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify(list));
+  });
+  updateCount();
 
-    closePanel();
-    showToast(`${name} — تمت الإضافة إلى اللائحة`);
+  function openSheet() {
+    lastFocus = document.activeElement;
+    input.value = '';
+    err.textContent = '';
+    scrim.hidden = false;
+    input.focus();
+  }
+  function closeSheet() {
+    scrim.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
-  saveBtn.addEventListener('click', addProductToList);
-
-  productName.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') saveBtn.click();
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = input.value.trim();
+    if (!v) { err.textContent = 'اكتب اسم القسم أولاً.'; input.focus(); return; }
+    if (names.indexOf(v) !== -1) { err.textContent = 'هذا القسم موجود بالفعل.'; input.focus(); return; }
+    names.push(v);
+    var f = makeFolder('tag', v, '٠ منتج', 'fresh');
+    grid.insertBefore(f, addBtn);
+    updateCount();
+    scrim.hidden = true;
+    lastFocus = f;
+    f.focus();
   });
+  document.getElementById('cancel').addEventListener('click', closeSheet);
+  scrim.addEventListener('click', function (e) { if (e.target === scrim) closeSheet(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !scrim.hidden) closeSheet(); });
+})();
 </script>
 
-</body>
-</html>
+</body></html>
