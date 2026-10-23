@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خبز</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top" id="top"></header>
+
+  <a class="back" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+    الأقسام
+  </a>
+
+  <div class="hero">
+    <div class="hero-text">
+      <h1 id="catTitle">خبز</h1>
+      <span class="count" id="catCount"></span>
+    </div>
+    <div class="hero-art" id="heroArt"></div>
+  </div>
+
+  <input class="field" id="q" type="search" placeholder="ابحث في القسم" autocomplete="off" aria-label="ابحث في القسم" hidden>
+  <div class="items t-bakery" id="items"></div>
+  <p class="none" id="none" hidden></p>
+  <div class="loadbox" id="loadBox">
+    <p id="loadMsg" role="status">جارٍ تحميل المنتجات…</p>
+    <button class="btn" type="button" id="retry" hidden>إعادة المحاولة</button>
+  </div>
+</div>
+
+<script src="js/art.js"></script>
+<script src="js/shared.js"></script>
+<script>
+  /* This page: خبز.  What the quantity box offers: by number of pieces only */
+  window.PAGE = {
+    type: 'Bakery',       // the "type" of this category in data/groceries_items.json
+    theme: 'bakery',      // look of the item tiles (see the .t-bakery rules in css/style.css)
+    art: 'bread',        // folder drawing used in the header
+    units: ['count'],
+    defaultUnit: 'count',
+    presets: []
+  };
+</script>
+<script src="js/category.js"></script>
+</body>
+</html>
