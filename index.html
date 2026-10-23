@@ -1,13 +1,13 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Chrili-list</title>
+<title>أقسام البقالة</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@500;700;800&display=swap">
 <style>
-/* Layout: a retro file cabinet. Two-column grid of folders (teal tab, hard black offset shadow, paper sheet peeking out the back),
-   a hand-drawn sticker inside each one, cart and shopping-list buttons pinned to the top corners exactly as in the wireframe.
-   Single look by choice: flat paper, black ink, one teal. */
+/* Layout: a retro file cabinet. Home is a two-column grid of folders. Opening a folder shows that aisle's items,
+   each aisle dressed differently (stickers, wooden crate, butcher tags, shelves, bubbles, spice jars, bakery bags).
+   Quantity, shopping list and cart open as bottom sheets. Single look by choice: flat paper, black ink, one teal. */
 :root {
   --paper: #efeeec;
   --ink: #0a0a0a;
@@ -15,7 +15,9 @@
   --mint: #d9f5ee;
   --cream: #fffbe8;
   --white: #ffffff;
+  --wood: #c98b5a;
   --danger: #a3211b;
+  --muted: #4a4947;
   --f-display: 'Lalezar', 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
   --f-body: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
 }
@@ -28,11 +30,13 @@ body {
   font-family: var(--f-body);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 18px 44px;
+  padding-block: 18px 48px;
   min-height: 100vh;
 }
 .app { max-width: 440px; margin: 0 auto; }
+button { font-family: inherit; }
 
+/* top bar: cart on the left, list on the right, like the wireframe */
 .top { direction: ltr; display: flex; justify-content: space-between; padding: 8px 10px 0; }
 .icon-btn {
   position: relative; width: 46px; height: 46px; display: grid; place-items: center; padding: 0;
@@ -49,20 +53,23 @@ body {
 }
 .badge.r { right: -10px; }
 .badge.l { left: -10px; }
+.badge.pop { animation: pop 0.3s ease-out; }
+@keyframes pop { 0% { scale: 1; } 50% { scale: 1.35; } 100% { scale: 1; } }
 
-/* heading */
+/* headings */
 .heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 26px; }
 h1 {
   margin: 0; font: 400 38px/1.15 var(--f-display); padding-inline: 6px;
   background-image: linear-gradient(transparent 60%, var(--teal) 60% 92%, transparent 92%);
 }
+h1:focus { outline: none; }
 .count {
   font: 800 13px/1 var(--f-body); padding: 7px 11px; background: var(--white);
   border: 2px solid var(--ink); border-radius: 999px; white-space: nowrap;
 }
-.lead { margin: 10px 6px 0; font: 500 15px/1.6 var(--f-body); color: #3b3a38; }
+.lead { margin: 10px 6px 0; font: 500 15px/1.6 var(--f-body); color: var(--muted); }
 
-/* folders */
+/* home: folders */
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; margin-top: 24px; }
 .folder {
   position: relative; display: block; width: 100%; padding: 20px 0 0; border: 0; background: none;
@@ -101,29 +108,209 @@ h1 {
 .folder.fresh .card { animation: drop 0.35s ease-out; }
 @keyframes drop { from { translate: 0 -10px; opacity: 0; } to { translate: 0 0; opacity: 1; } }
 
-/* add sheet */
-.scrim { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; background: rgba(10, 10, 10, 0.5); }
-.sheet {
-  width: 100%; max-width: 440px; display: grid; gap: 14px; background: var(--cream);
-  border: 2px solid var(--ink); border-bottom: 0; border-radius: 16px 16px 0 0;
-  padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+/* category page */
+.back {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 9px 14px 9px 12px;
+  background: var(--white); border: 2px solid var(--ink); border-radius: 999px; box-shadow: 3px 3px 0 var(--ink);
+  font: 800 14px/1 var(--f-body); color: var(--ink); cursor: pointer; transition: translate 0.08s, box-shadow 0.08s;
 }
-.sheet h2 { margin: 0; font: 400 28px/1.2 var(--f-display); }
-.sheet label { font: 800 14px/1 var(--f-body); }
+.back:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+.back:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px; }
+.back svg { width: 18px; height: 18px; }
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 22px; }
+.hero-text { min-width: 0; display: grid; gap: 10px; justify-items: start; }
+.hero-art {
+  flex: none; width: 112px; padding: 6px 8px; background: var(--white); border: 2px solid var(--ink);
+  border-radius: 12px; box-shadow: 4px 4px 0 var(--ink); rotate: -3deg;
+}
+.hero-art svg { display: block; width: 100%; height: auto; overflow: visible; }
+.seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: var(--white);
+  border: 2px solid var(--ink); border-radius: 12px;
+}
+.seg button {
+  padding: 11px 8px; background: transparent; color: var(--ink); border: 2px solid transparent; border-radius: 8px;
+  font: 800 16px/1.1 var(--f-body); cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--teal); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.seg button:focus-visible { outline: 3px dashed var(--ink); outline-offset: 2px; }
 .field {
-  width: 100%; margin-top: 8px; padding: 12px 14px; background: var(--white); color: var(--ink);
+  width: 100%; padding: 12px 14px; background: var(--white); color: var(--ink);
   border: 2px solid var(--ink); border-radius: 8px; font: 500 16px/1.4 var(--f-body);
 }
 .field:focus { outline: none; box-shadow: 3px 3px 0 var(--teal); }
+#q { margin-top: 18px; }
+.none { margin: 26px 6px 0; font: 700 15px/1.6 var(--f-body); color: var(--muted); }
+.addprod {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 28px; padding: 14px;
+  background: var(--mint); color: var(--ink); border: 2px dashed var(--ink); border-radius: 12px;
+  font: 800 16px/1 var(--f-body); cursor: pointer;
+}
+.addprod:active { translate: 2px 2px; }
+.addprod:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px; }
+
+/* items: shared tile */
+.items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 14px; margin-top: 22px; }
+.item {
+  position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; min-height: 100px; padding: 16px 10px 12px; background: var(--tint, var(--white));
+  border: 2px solid var(--ink); border-radius: 12px; box-shadow: 3px 3px 0 var(--ink);
+  font: inherit; color: var(--ink); text-align: center; cursor: pointer;
+  transition: translate 0.08s, box-shadow 0.08s; -webkit-tap-highlight-color: transparent;
+}
+.item:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+.item:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px; }
+.emb svg { display: block; width: 28px; height: 28px; }
+.iname { max-width: 100%; font: 800 17px/1.25 var(--f-body); overflow-wrap: anywhere; }
+.iq { display: none; padding: 4px 9px; background: var(--ink); color: var(--white); border-radius: 999px; font: 700 12px/1.2 var(--f-body); }
+.item.in .iq { display: inline-block; }
+.plus {
+  position: absolute; top: 6px; left: 6px; z-index: 2; width: 26px; height: 26px; display: grid; place-items: center;
+  background: var(--teal); border: 2px solid var(--ink); border-radius: 50%;
+}
+.plus svg { width: 12px; height: 12px; }
+.plus .tk { display: none; }
+.item.in .plus .pl { display: none; }
+.item.in .plus .tk { display: block; }
+
+/* aisle themes: fruit stickers (also used for custom aisles) */
+.t-fruit, .t-custom { --t1: #ffb877; --t2: #ff9fb2; --t3: #ffe066; --t4: #8fe3b0; --t5: #8cc8ff; --t6: #cdb4ff; }
+.t-fruit .item, .t-custom .item { border-radius: 20px; }
+.t-fruit .item:nth-child(odd), .t-custom .item:nth-child(odd) { rotate: -1.2deg; }
+.t-fruit .item:nth-child(even), .t-custom .item:nth-child(even) { rotate: 1.2deg; }
+/* vegetables: wooden crate */
+.t-veg { --t1: #fffbe8; --t2: #d9f5ee; --t3: #fff3d6; --t4: #d7f2c6; --t5: #fffbe8; --t6: #ffe9c2; }
+.items.t-veg {
+  padding: 16px 14px 20px; border: 2px solid var(--ink); border-radius: 10px; box-shadow: 4px 4px 0 var(--ink);
+  background: repeating-linear-gradient(180deg, #d9a96a 0 30px, var(--ink) 30px 32px);
+}
+.t-veg .item { border-radius: 8px; }
+/* meat: butcher tags with a string hole */
+.t-meat { --t1: #fffbe8; --t2: #ffd7dc; --t3: #fffbe8; --t4: #ffd7dc; --t5: #ffe3d1; --t6: #fffbe8; }
+.t-meat .item { padding-top: 32px; border-radius: 18px 18px 6px 6px; }
+.t-meat .item::before {
+  content: ""; position: absolute; top: 9px; left: 50%; translate: -50% 0; width: 12px; height: 12px;
+  background: var(--paper); border: 2px solid var(--ink); border-radius: 50%;
+}
+/* food stuffs: boxes on shelves */
+.t-pantry { --t1: #8cc8ff; --t2: #ffe066; --t3: #ff9f8f; --t4: #c8f0b8; --t5: #ffb877; --t6: #e6dcc8; }
+.items.t-pantry { row-gap: 36px; }
+.t-pantry .item { border-radius: 6px; }
+.t-pantry .iname { width: 100%; padding: 5px 8px; background: var(--white); border: 2px solid var(--ink); border-radius: 4px; }
+.t-pantry .item::after {
+  content: ""; position: absolute; z-index: -1; left: -6px; right: -6px; bottom: -13px; height: 13px;
+  background: var(--wood); border: 2px solid var(--ink); border-radius: 3px;
+}
+/* cleaning: floating bubbles */
+.t-clean { --t1: #bfe3ff; --t2: #d6f5ee; --t3: #e3d9ff; --t4: #cfeeff; --t5: #ffe0f0; --t6: #d9ecff; }
+.items.t-clean { gap: 14px; }
+.t-clean .item {
+  aspect-ratio: 1; padding: 22px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 26%, #fff 0 7%, transparent 8%), var(--tint);
+}
+.t-clean .item:nth-child(even) { margin-top: 22px; }
+.t-clean .plus { top: 12%; left: 12%; }
+/* attar: spice jars with lids */
+.t-attar { --t1: #ffd23f; --t2: #ff9f6b; --t3: #d9a06b; --t4: #9fdc8f; --t5: #ffb347; --t6: #e6dcc8; }
+.items.t-attar { padding-top: 16px; row-gap: 32px; }
+.t-attar .item { border-radius: 10px 10px 18px 18px; }
+.t-attar .item::before {
+  content: ""; position: absolute; top: -14px; left: 22%; right: 22%; height: 14px;
+  background: var(--wood); border: 2px solid var(--ink); border-bottom: 0; border-radius: 5px 5px 0 0;
+}
+.t-attar .iname { width: 100%; padding: 5px 8px; background: var(--cream); border: 2px solid var(--ink); border-radius: 3px; }
+/* bakery: stitched paper bags */
+.t-bakery { --t1: #f2b765; --t2: #e9a959; --t3: #ffd7a0; --t4: #f2b765; --t5: #ffd7a0; --t6: #e9a959; }
+.t-bakery .item { border-radius: 16px 16px 6px 6px; }
+.t-bakery .item::before {
+  content: ""; position: absolute; inset: 5px; z-index: -1; pointer-events: none;
+  border: 2px dashed rgba(10, 10, 10, 0.55); border-radius: 12px 12px 3px 3px;
+}
+.items .item:nth-child(6n+1) { --tint: var(--t1); }
+.items .item:nth-child(6n+2) { --tint: var(--t2); }
+.items .item:nth-child(6n+3) { --tint: var(--t3); }
+.items .item:nth-child(6n+4) { --tint: var(--t4); }
+.items .item:nth-child(6n+5) { --tint: var(--t5); }
+.items .item:nth-child(6n+6) { --tint: var(--t6); }
+
+/* sheets */
+.scrim { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; background: rgba(10, 10, 10, 0.5); }
+.sheet {
+  width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto; display: grid; gap: 16px; align-content: start;
+  background: var(--cream); border: 2px solid var(--ink); border-bottom: 0; border-radius: 16px 16px 0 0;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sheet h2 { margin: 0; min-width: 0; font: 400 28px/1.2 var(--f-display); overflow-wrap: anywhere; }
+.sheet label { font: 800 14px/1 var(--f-body); }
+.sheet label + .field { margin-top: 8px; }
+.x {
+  flex: none; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; background: var(--white);
+  border: 2px solid var(--ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--ink); cursor: pointer;
+}
+.x:active { translate: 1px 1px; box-shadow: 1px 1px 0 var(--ink); }
+.x:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
+.x svg { width: 18px; height: 18px; }
 .err { margin: 0; min-height: 1.2em; font: 700 14px/1.4 var(--f-body); color: var(--danger); }
 .actions { display: flex; gap: 12px; }
 .btn {
-  flex: 1; padding: 13px 16px; background: var(--white); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px;
-  box-shadow: 3px 3px 0 var(--ink); font: 800 16px/1 var(--f-body); cursor: pointer; transition: translate 0.08s, box-shadow 0.08s;
+  flex: 1; padding: 14px 16px; background: var(--white); color: var(--ink); border: 2px solid var(--ink); border-radius: 10px;
+  box-shadow: 3px 3px 0 var(--ink); font: 800 17px/1 var(--f-body); cursor: pointer; transition: translate 0.08s, box-shadow 0.08s;
 }
 .btn.primary { background: var(--teal); flex: 2; }
+.btn.wide { width: 100%; flex: none; padding: 17px 16px; }
 .btn:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
 .btn:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
+.btn.ghost { box-shadow: none; background: transparent; border-style: dashed; color: var(--danger); font-size: 15px; padding: 12px; }
+.stepper { display: grid; grid-template-columns: 66px minmax(0, 1fr) 66px; align-items: center; gap: 12px; margin-block: 4px; }
+.step {
+  width: 66px; height: 66px; padding: 0; background: var(--white); color: var(--ink); border: 2px solid var(--ink); border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink); font: 800 32px/1 var(--f-body); cursor: pointer; transition: translate 0.08s, box-shadow 0.08s;
+}
+.step:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+.step:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
+.step:disabled { opacity: 0.35; box-shadow: none; cursor: default; }
+.val { display: grid; gap: 4px; justify-items: center; text-align: center; }
+.val output { font: 800 46px/1 var(--f-body); font-variant-numeric: tabular-nums; }
+.val span { font: 700 15px/1.2 var(--f-body); color: var(--muted); }
+.rows { margin: 0; padding: 2px 4px 6px 2px; list-style: none; display: grid; gap: 12px; max-height: min(44vh, 360px); overflow-y: auto; }
+.rows li {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 12px;
+  background: var(--white); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+}
+.chk {
+  width: 32px; height: 32px; display: grid; place-items: center; padding: 0; background: var(--white);
+  border: 2px solid var(--ink); border-radius: 7px; box-shadow: 2px 2px 0 var(--ink); cursor: pointer;
+}
+.chk svg { width: 16px; height: 16px; display: none; }
+.chk[aria-pressed="true"] { background: var(--teal); }
+.chk[aria-pressed="true"] svg { display: block; }
+.chk:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
+.rinfo { min-width: 0; display: grid; gap: 3px; }
+.rname { font: 800 17px/1.2 var(--f-body); overflow-wrap: anywhere; }
+.rmeta { font: 500 13px/1.3 var(--f-body); color: var(--muted); }
+.rows li.done .rname { text-decoration: line-through; }
+.empty { margin: 4px 0 0; padding: 18px 14px; background: var(--mint); border: 2px dashed var(--ink); border-radius: 10px; font: 700 15px/1.7 var(--f-body); text-align: center; }
+
+.logo { cursor: default; }
+.logo:active { translate: none; box-shadow: 3px 3px 0 var(--ink); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn:disabled { opacity: 0.4; box-shadow: none; cursor: default; }
+.presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-block: 4px; }
+.preset {
+  padding: 20px 6px; background: var(--white); color: var(--ink); border: 2px solid var(--ink); border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink); font: 800 19px/1.1 var(--f-body); cursor: pointer; transition: translate 0.08s, box-shadow 0.08s;
+}
+.preset[aria-pressed="true"] { background: var(--teal); translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+.preset:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
+#clearBtn { color: var(--danger); }
+#clearBtn.armed { background: var(--danger); color: var(--white); }
+.sheet-head .field { flex: 1; width: auto; min-width: 0; }
+.loadbox { display: grid; gap: 12px; justify-items: start; margin: 22px 6px 0; }
+.loadbox p { margin: 0; font: 700 15px/1.6 var(--f-body); color: var(--muted); }
+.loadbox .btn { flex: none; }
+.note { margin: 0; min-height: 1.3em; font: 700 14px/1.5 var(--f-body); color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -132,46 +319,111 @@ h1 {
 
 <div class="app" dir="rtl" lang="ar">
   <header class="top">
-    <button class="icon-btn" type="button" aria-label="السلة">
+    <div class="icon-btn logo" role="img" aria-label="شعار البقالة">
       <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M2.5 4h3l2.2 10.2h10.2L20.6 7H6.4"/><path d="M9 10h10M9.6 12.4H18"/><circle cx="9.4" cy="18.6" r="1.5"/><circle cx="17.2" cy="18.6" r="1.5"/>
       </svg>
-      <span class="badge r"></span>
-    </button>
-    <button class="icon-btn" type="button" aria-label="قائمة التسوق">
+    </div>
+    <button class="icon-btn" type="button" id="listBtn" aria-label="قائمة التسوق">
       <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="4.5" y="4.5" width="15" height="17" rx="2.2"/><rect x="8.5" y="2.5" width="7" height="4" rx="1.2" fill="#fff"/>
         <path d="M8 11l1.2 1.2L11.4 10M13.4 11.4H16M8 16.4l1.2 1.2 2.2-2.2M13.4 16.8H16"/>
       </svg>
-      <span class="badge l"></span>
+      <span class="badge l" id="listBadge" hidden>0</span>
     </button>
   </header>
 
-  <main class="grid" id="grid"></main>
+  <section id="viewHome">
+    <div class="heading">
+      <h1 id="homeTitle" tabindex="-1">الأقسام</h1>
+      <span class="count" id="count"></span>
+    </div>
+    <p class="lead">اختر قسماً، أو أضف منتجاً من عندك.</p>
+    <div class="loadbox" id="loadBox">
+      <p id="loadMsg" role="status">جارٍ تحميل المنتجات…</p>
+      <button class="btn" type="button" id="retry" hidden>إعادة المحاولة</button>
+    </div>
+    <main class="grid" id="grid"></main>
+  </section>
+
+  <section id="viewCat" hidden>
+    <button class="back" type="button" id="backBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      الأقسام
+    </button>
+    <div class="hero">
+      <div class="hero-text">
+        <h1 id="catTitle" tabindex="-1"></h1>
+        <span class="count" id="catCount"></span>
+      </div>
+      <div class="hero-art" id="heroArt"></div>
+    </div>
+    <input class="field" id="q" type="search" placeholder="ابحث في القسم" autocomplete="off" aria-label="ابحث في القسم" hidden>
+    <div class="items" id="items"></div>
+    <p class="none" id="none" hidden></p>
+  </section>
 
   <div class="scrim" id="scrim" hidden>
-    <form class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" novalidate>
-      <h2 id="sheetTitle">قسم جديد</h2>
-      <div>
-        <label for="catName">اسم القسم</label>
-        <input class="field" id="catName" type="text" maxlength="18" autocomplete="off" placeholder="مثال: مشروبات">
+    <section class="sheet" id="sheetQty" role="dialog" aria-modal="true" aria-labelledby="qtyTitle" hidden>
+      <div class="sheet-head">
+        <h2 id="qtyTitle"></h2>
+        <input class="field" id="customName" type="text" maxlength="30" autocomplete="off" placeholder="اسم المنتج" aria-label="اسم المنتج" hidden>
+        <button class="x" type="button" data-close aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
-      <p class="err" id="err" role="alert"></p>
+      <p class="err" id="qtyErr" role="alert" hidden></p>
+      <div class="seg" id="unitSeg"></div>
+      <div class="presets" id="presets" hidden></div>
+      <div class="stepper" id="stepper">
+        <button class="step" type="button" id="minus" aria-label="إنقاص">−</button>
+        <div class="val"><output id="qtyVal">1</output><span id="qtyUnit">قطعة</span></div>
+        <button class="step" type="button" id="plusBtn" aria-label="زيادة">+</button>
+      </div>
+      <button class="btn primary wide" type="button" id="qtyOk">إضافة إلى اللائحة</button>
+      <button class="btn ghost" type="button" id="qtyDel" hidden>إزالة من اللائحة</button>
+    </section>
+
+    <section class="sheet" id="sheetList" role="dialog" aria-modal="true" aria-labelledby="listTitle" hidden>
+      <div class="sheet-head">
+        <h2 id="listTitle">قائمة التسوق</h2>
+        <button class="x" type="button" data-close aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <ul class="rows" id="rows"></ul>
+      <p class="empty" id="listEmpty" hidden></p>
       <div class="actions">
-        <button class="btn primary" type="submit">إضافة القسم</button>
-        <button class="btn" type="button" id="cancel">إلغاء</button>
+        <button class="btn primary" type="button" id="shareBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v7h14v-7"/></svg>
+          مشاركة القائمة
+        </button>
+        <button class="btn" type="button" id="clearBtn">مسح الكل</button>
       </div>
-    </form>
+      <p class="note" id="shareMsg" role="status" aria-live="polite"></p>
+    </section>
   </div>
 </div>
 
 <script>
 (function () {
-  var O = '<svg viewBox="0 0 120 80" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">';
-  var C = '</svg>';
+  var $ = function (id) { return document.getElementById(id); };
 
+  /* ---------- data: read from groceries_items.json, published next to this page ---------- */
+  var META = {
+    'Fruits': { theme: 'fruit', art: 'fruit', unit: 'count' },
+    'Vegetables': { theme: 'veg', art: 'veg', unit: 'kg' },
+    'Food Stuffs': { theme: 'pantry', art: 'pantry', unit: 'count' },
+    'Meat': { theme: 'meat', art: 'meat', unit: 'kg' },
+    'Cleaning Products': { theme: 'clean', art: 'clean', unit: 'count' },
+    'Attar': { theme: 'attar', art: 'spice', unit: 'kg' },
+    'Bakery': { theme: 'bakery', art: 'bread', unit: 'count' }
+  };
+  /* folder order on the home page; any new type found in the file goes after these */
+  var ORDER = ['Vegetables', 'Fruits', 'Meat', 'Food Stuffs', 'Attar', 'Cleaning Products', 'Bakery'];
+  var UNIT = { count: 'قطعة', kg: 'كيلو', da: 'DA' };
+  var ULAB = { count: 'بالعدد', kg: 'بالكيلو', da: 'بالمبلغ' };
+
+  /* ---------- artwork ---------- */
+  var O = '<svg viewBox="0 0 120 80" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">';
+  var E = '</svg>';
   var ART = {
-    /* خضر: carrot with leafy top and a tomato */
     veg: O +
       '<g transform="translate(50 28) rotate(38)">' +
         '<path d="M-3 0 C-14 -10 -12 -22 -8 -24 C-5 -16 -3 -10 -1 -3 Z" fill="#4fc26b"/>' +
@@ -182,9 +434,7 @@ h1 {
       '</g>' +
       '<circle cx="94" cy="46" r="18" fill="#ff5a4d"/>' +
       '<path d="M82 32 L90 36 L94 28 L98 36 L106 32 L100 40 H88 Z" fill="#4fc26b"/>' +
-      '<path d="M84 50 Q83 43 89 39" stroke="#fff" stroke-width="3"/>' + C,
-
-    /* فواكه: orange slice and a strawberry */
+      '<path d="M84 50 Q83 43 89 39" stroke="#fff" stroke-width="3"/>' + E,
     fruit: O +
       '<circle cx="38" cy="42" r="26" fill="#ff8a3d"/>' +
       '<circle cx="38" cy="42" r="20" fill="#ffe0a3" stroke-width="2"/>' +
@@ -192,23 +442,17 @@ h1 {
       '<circle cx="38" cy="42" r="4" fill="#ffe0a3" stroke="none"/>' +
       '<path d="M92 30 Q112 28 108 48 Q104 66 92 72 Q80 66 76 48 Q72 28 92 30 Z" fill="#ff5a4d"/>' +
       '<path d="M80 29 L92 35 L104 29 L99 38 L92 34 L85 38 Z" fill="#4fc26b"/>' +
-      '<g fill="#ffd23f" stroke="none"><circle cx="86" cy="48" r="1.8"/><circle cx="98" cy="48" r="1.8"/><circle cx="92" cy="57" r="1.8"/><circle cx="84" cy="59" r="1.8"/><circle cx="100" cy="59" r="1.8"/></g>' + C,
-
-    /* لحم: T-bone steak */
+      '<g fill="#ffd23f" stroke="none"><circle cx="86" cy="48" r="1.8"/><circle cx="98" cy="48" r="1.8"/><circle cx="92" cy="57" r="1.8"/><circle cx="84" cy="59" r="1.8"/><circle cx="100" cy="59" r="1.8"/></g>' + E,
     meat: O +
       '<path d="M16 42 Q12 20 40 16 Q72 10 96 24 Q112 38 100 54 Q84 70 52 66 Q20 66 16 42 Z" fill="#ff6b78"/>' +
       '<path d="M28 30 Q40 24 52 30 M68 22 Q82 26 90 36 M28 48 Q38 54 48 52" stroke="#ffd7dc" stroke-width="3"/>' +
-      '<path d="M44 28 H78 V38 H66 V56 H56 V38 H44 Z" fill="#fff8e6"/>' + C,
-
-    /* مواد غذائية: tin can and a cereal box */
+      '<path d="M44 28 H78 V38 H66 V56 H56 V38 H44 Z" fill="#fff8e6"/>' + E,
     pantry: O +
       '<g transform="rotate(6 83 41)"><rect x="62" y="14" width="42" height="54" rx="3" fill="#ff5a4d"/>' +
       '<circle cx="83" cy="34" r="11" fill="#ffd23f"/><rect x="70" y="51" width="26" height="8" rx="2" fill="#fff8e6"/></g>' +
       '<path d="M14 26 V62 Q32 72 50 62 V26" fill="#4aa3ff"/>' +
       '<ellipse cx="32" cy="26" rx="18" ry="6" fill="#d9ecff"/>' +
-      '<path d="M14 39 Q32 46 50 39 V52 Q32 59 14 52 Z" fill="#ffd23f"/>' + C,
-
-    /* عطار: spice jar, star anise and a chili */
+      '<path d="M14 39 Q32 46 50 39 V52 Q32 59 14 52 Z" fill="#ffd23f"/>' + E,
     spice: O +
       '<rect x="22" y="12" width="36" height="12" rx="3" fill="#c98b5a"/>' +
       '<path d="M24 24 H56 Q62 28 62 36 V62 Q62 70 54 70 H26 Q18 70 18 62 V36 Q18 28 24 24 Z" fill="#fff8e6"/>' +
@@ -220,9 +464,7 @@ h1 {
         '<circle r="4" fill="#5a2f14"/>' +
       '</g>' +
       '<path d="M76 60 Q94 54 110 66 Q96 76 82 70 Q74 66 76 60 Z" fill="#ff5a4d"/>' +
-      '<path d="M76 60 Q71 55 75 51" stroke-width="3"/>' + C,
-
-    /* منتجات التنظيف: spray bottle, soap bubbles, sparkle */
+      '<path d="M76 60 Q71 55 75 51" stroke-width="3"/>' + E,
     clean: O +
       '<rect x="22" y="32" width="32" height="38" rx="7" fill="#4aa3ff"/>' +
       '<rect x="32" y="22" width="12" height="10" fill="#fff8e6"/>' +
@@ -230,114 +472,510 @@ h1 {
       '<rect x="28" y="44" width="20" height="14" rx="2" fill="#fff8e6"/>' +
       '<g fill="#d9ecff"><circle cx="80" cy="22" r="10"/><circle cx="98" cy="40" r="7"/><circle cx="82" cy="54" r="8"/><circle cx="108" cy="16" r="4"/></g>' +
       '<g stroke="#fff" stroke-width="2"><path d="M75 19 Q77 16 80 16"/><path d="M95 38 Q96 36 98 36"/><path d="M78 52 Q79 49 82 49"/></g>' +
-      '<path d="M104 62 L106 68 L112 70 L106 72 L104 78 L102 72 L96 70 L102 68 Z" fill="#ffd23f"/>' + C,
-
-    /* خبز: round loaf with scoring and a baguette behind it */
+      '<path d="M104 62 L106 68 L112 70 L106 72 L104 78 L102 72 L96 70 L102 68 Z" fill="#ffd23f"/>' + E,
     bread: O +
       '<g transform="rotate(-28 90 36)"><rect x="64" y="28" width="52" height="16" rx="8" fill="#e9a959"/>' +
       '<path d="M76 31 L80 41 M88 31 L92 41 M100 31 L104 41" stroke-width="2"/></g>' +
       '<path d="M14 56 Q10 30 38 26 Q68 24 72 52 Q74 68 44 70 Q18 72 14 56 Z" fill="#f2b765"/>' +
-      '<path d="M28 37 Q32 44 28 54 M42 33 Q46 42 42 55 M56 37 Q60 44 56 54" stroke="#fff8e6" stroke-width="4"/>' + C,
-
-    /* اضافة: chunky plus with a printed shadow */
+      '<path d="M28 37 Q32 44 28 54 M42 33 Q46 42 42 55 M56 37 Q60 44 56 54" stroke="#fff8e6" stroke-width="4"/>' + E,
     add: O +
       '<path transform="translate(3 3)" d="M52 14 H68 V32 H86 V48 H68 V66 H52 V48 H34 V32 H52 Z" fill="#0a0a0a"/>' +
-      '<path d="M52 14 H68 V32 H86 V48 H68 V66 H52 V48 H34 V32 H52 Z" fill="#00bfa5"/>' + C,
-
-    /* new category: price tag */
+      '<path d="M52 14 H68 V32 H86 V48 H68 V66 H52 V48 H34 V32 H52 Z" fill="#00bfa5"/>' + E,
     tag: O +
       '<path d="M14 20 Q14 14 20 14 H64 L104 40 L64 66 H20 Q14 66 14 60 Z" fill="#ffd23f"/>' +
       '<circle cx="30" cy="40" r="5" fill="#efeeec"/>' +
-      '<path d="M46 32 H72 M46 44 H64" stroke-width="3"/>' + C
+      '<path d="M46 32 H72 M46 44 H64" stroke-width="3"/>' + E
   };
-
+  var G0 = '<svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+  var GL = {
+    fruit: G0 + '<circle cx="12" cy="14" r="7" fill="#fff"/><path d="M12 7c0-2 1.5-3.5 3.5-4"/></svg>',
+    veg: G0 + '<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15Z" fill="#fff"/><path d="M5 19 13 11"/></svg>',
+    meat: G0 + '<path d="M4 7h16v5h-6v8h-4v-8H4Z" fill="#fff"/></svg>',
+    pantry: G0 + '<path d="M6 6v12c0 1.7 2.7 3 6 3s6-1.3 6-3V6" fill="#fff"/><ellipse cx="12" cy="6" rx="6" ry="2.5" fill="#fff"/></svg>',
+    clean: G0 + '<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2Z" fill="#fff"/></svg>',
+    attar: G0 + '<circle cx="8" cy="14" r="2" fill="#fff"/><circle cx="15" cy="9" r="2" fill="#fff"/><circle cx="16" cy="17" r="2" fill="#fff"/></svg>',
+    bakery: G0 + '<path d="M12 21V6"/><path d="M12 10c-3 0-4.5-2-4.5-4.5 3 0 4.5 2 4.5 4.5Zm0 5c-3 0-4.5-2-4.5-4.5 3 0 4.5 2 4.5 4.5Zm0-5c3 0 4.5-2 4.5-4.5-3 0-4.5 2-4.5 4.5Zm0 5c3 0 4.5-2 4.5-4.5-3 0-4.5 2-4.5 4.5Z" fill="#fff"/></svg>'
+  };
+  GL.custom = GL.fruit;
   var CHEV = '<svg class="go" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#0a0a0a"/>' +
     '<path d="M13.5 7.5 9 12l4.5 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var PLUS = '<svg class="pl" viewBox="0 0 12 12" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round"><path d="M6 1.5v9M1.5 6h9"/></svg>';
+  var CHECK = '<svg class="tk" viewBox="0 0 12 12" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.6 2.6L10 3.4"/></svg>';
+  var CHK = '<svg viewBox="0 0 12 12" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5l2.6 2.6L10 3.4"/></svg>';
+  var XICON = '<svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 
-  /* order matches the original page when read right to left */
-  var CATS = [
-    ['veg', 'خضر', '٣٦ منتج'],
-    ['fruit', 'فواكه', '٢٨ منتج'],
-    ['meat', 'لحم', '١٤ منتج'],
-    ['pantry', 'مواد غذائية', '٨٢ منتج'],
-    ['spice', 'عطار', '٣١ منتج'],
-    ['clean', 'منتجات التنظيف', '٢٢ منتج'],
-    ['add', 'اضافة', 'جديد'],
-    ['bread', 'خبز', '٩ منتجات']
-  ];
+  /* ---------- state (list saved in this browser) ---------- */
+  var KEY = 'groceries-retro-v1';
+  var S = load();
+  function load() {
+    try {
+      var r = localStorage.getItem(KEY);
+      if (r) {
+        var o = JSON.parse(r);
+        if (o && Array.isArray(o.list)) return { list: o.list };
+      }
+    } catch (e) {}
+    return { list: [] };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify({ list: S.list })); } catch (e) {} }
 
-  var grid = document.getElementById('grid');
-  var countEl = document.getElementById('count');
-  var scrim = document.getElementById('scrim');
-  var form = document.getElementById('sheet');
-  var input = document.getElementById('catName');
-  var err = document.getElementById('err');
-  var addBtn = null;
+  var grid = $('grid'), itemsEl = $('items');
+  var CATS = [];
+  var cur = { cat: null, q: '' };
   var lastFocus = null;
-  var names = [];
+  var Q = null;
 
-  function toAr(n) { return String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }); }
+  function fmt(q) { return String(Math.round(q * 10) / 10); }
+  function qtyText(e) { return e.unit === 'da' ? fmt(e.qty) + ' DA' : fmt(e.qty) + ' ' + UNIT[e.unit]; }
+  function ordered() {
+    return S.list.filter(function (e) { return !e.bought; }).concat(S.list.filter(function (e) { return e.bought; }));
+  }
+  function entryId(cat, name) { return cat.ar + '|' + name; }
+  function findEntry(id) { return S.list.filter(function (e) { return e.id === id; })[0]; }
 
-  function makeFolder(key, name, tabText, extra) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'folder' + (extra ? ' ' + extra : '');
-    b.setAttribute('aria-label', name);
-    b.innerHTML =
-      '<span class="paper" aria-hidden="true"></span>' +
-      '<span class="tab"><span class="tabtxt"></span></span>' +
-      '<span class="card"><span class="art">' + ART[key] + '</span>' +
-      '<span class="row"><span class="name"></span>' + CHEV + '</span></span>';
-    b.querySelector('.tabtxt').textContent = tabText;
-    b.querySelector('.name').textContent = name;
-    return b;
+  /* ---------- build the categories from the JSON ---------- */
+  function buildCats(json) {
+    var list = (json && json.groceries) || [];
+    var cats = list.map(function (g, i) {
+      var m = META[g.type] || { theme: 'custom', art: 'tag', unit: 'count' };
+      var c = { type: g.type, ar: g.name_ar || g.type, theme: m.theme, art: m.art, unit: m.unit, items: [], byItem: false, idx: i };
+      if (g.sub_types && g.sub_types.length) {
+        /* e.g. food stuffs: each item keeps the unit of the group it sits in (By Kg / By Piece) */
+        c.byItem = true;
+        g.sub_types.forEach(function (s) {
+          var u = s.type === 'By Kg' ? 'kg' : 'count';
+          (s.kinds || []).forEach(function (n) { c.items.push({ n: n, u: u }); });
+        });
+      } else {
+        (g.kinds || []).forEach(function (n) { c.items.push({ n: n, u: m.unit }); });
+      }
+      return c;
+    });
+    cats.sort(function (a, b) {
+      var x = ORDER.indexOf(a.type), y = ORDER.indexOf(b.type);
+      x = x === -1 ? 99 : x; y = y === -1 ? 99 : y;
+      return x - y || a.idx - b.idx;
+    });
+    return cats;
+  }
+  function loadData() {
+    var box = $('loadBox'), msg = $('loadMsg'), retry = $('retry');
+    box.hidden = false; retry.hidden = true;
+    msg.textContent = 'جارٍ تحميل المنتجات…';
+    fetch('groceries_items.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+      .then(function (j) {
+        var cats = buildCats(j);
+        if (!cats.length) throw new Error('empty');
+        CATS = cats;
+        box.hidden = true;
+        renderHome();
+      })
+      .catch(function () {
+        msg.textContent = 'تعذر تحميل المنتجات من ملف groceries_items.json.';
+        retry.hidden = false;
+      });
+  }
+  $('retry').addEventListener('click', loadData);
+
+  /* ---------- home ---------- */
+  function renderHome() {
+    grid.innerHTML = '';
+    CATS.concat([null]).forEach(function (c) {
+      var isAdd = c === null;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'folder' + (isAdd ? ' add' : '');
+      var nm = isAdd ? 'اضافة' : c.ar;
+      b.setAttribute('aria-label', isAdd ? 'إضافة منتج إلى اللائحة' : nm);
+      b.innerHTML =
+        '<span class="paper" aria-hidden="true"></span>' +
+        '<span class="tab"><span class="tabtxt"></span></span>' +
+        '<span class="card"><span class="art">' + (isAdd ? ART.add : ART[c.art]) + '</span>' +
+        '<span class="row"><span class="name"></span>' + CHEV + '</span></span>';
+      b.querySelector('.tabtxt').textContent = isAdd ? 'منتج جديد' : c.items.length + ' منتج';
+      b.querySelector('.name').textContent = nm;
+      if (isAdd) b.addEventListener('click', openCustom);
+      else b.addEventListener('click', function () { showCat(c); });
+      grid.appendChild(b);
+    });
+    var n = CATS.length;
+    $('count').hidden = !n;
+    $('count').textContent = n + (n <= 10 ? ' أقسام' : ' قسماً');
   }
 
-  function updateCount() {
-    var n = names.length;
-    countEl.textContent = toAr(n) + (n <= 10 ? ' أقسام' : ' قسماً');
+  /* ---------- category page ---------- */
+  function showHome() {
+    $('viewCat').hidden = true;
+    $('viewHome').hidden = false;
+    cur.cat = null;
+    window.scrollTo(0, 0);
+    $('homeTitle').focus();
+  }
+  function showCat(cat) {
+    cur = { cat: cat, q: '' };
+    $('q').value = '';
+    $('catTitle').textContent = cat.ar;
+    $('heroArt').innerHTML = ART[cat.art];
+    $('viewHome').hidden = true;
+    $('viewCat').hidden = false;
+    renderItems();
+    window.scrollTo(0, 0);
+    $('catTitle').focus();
+  }
+  function renderItems() {
+    var cat = cur.cat;
+    if (!cat) return;
+    var all = cat.items;
+    var q = cur.q.trim().toLowerCase();
+    var shown = q ? all.filter(function (x) { return x.n.toLowerCase().indexOf(q) !== -1; }) : all;
+    $('q').hidden = all.length < 12 && !q;
+    $('catCount').textContent = all.length + ' منتج';
+    itemsEl.className = 'items t-' + cat.theme;
+    itemsEl.innerHTML = '';
+    shown.forEach(function (x) {
+      var id = entryId(cat, x.n), e = findEntry(id);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'item' + (e ? ' in' : '');
+      b.innerHTML = '<span class="plus" aria-hidden="true">' + PLUS + CHECK + '</span>' +
+        '<span class="emb" aria-hidden="true">' + (GL[cat.theme] || GL.fruit) + '</span>' +
+        '<span class="iname" dir="auto"></span><span class="iq"></span>';
+      b.querySelector('.iname').textContent = x.n;
+      if (e) b.querySelector('.iq').textContent = qtyText(e);
+      b.setAttribute('aria-label', x.n + (e ? '، في اللائحة: ' + qtyText(e) : ''));
+      b.addEventListener('click', function () { openQty(cat, x.n, x.u); });
+      itemsEl.appendChild(b);
+    });
+    var none = $('none');
+    none.hidden = shown.length > 0;
+    none.textContent = 'لا توجد نتائج لهذا البحث.';
+  }
+  $('backBtn').addEventListener('click', showHome);
+  $('q').addEventListener('input', function () { cur.q = this.value; renderItems(); });
+
+  /* ---------- badge ---------- */
+  var lastCount = 0;
+  function updateBadges() {
+    var l = S.list.filter(function (e) { return !e.bought; }).length;
+    var el = $('listBadge');
+    el.hidden = l === 0;
+    el.textContent = l;
+    if (l !== lastCount && l > 0) {
+      el.classList.remove('pop');
+      void el.offsetWidth;
+      el.classList.add('pop');
+    }
+    lastCount = l;
   }
 
-  CATS.forEach(function (c) {
-    if (c[0] === 'add') {
-      addBtn = makeFolder('add', c[1], c[2], 'add');
-      addBtn.addEventListener('click', openSheet);
-      grid.appendChild(addBtn);
-    } else {
-      names.push(c[1]);
-      grid.appendChild(makeFolder(c[0], c[1], c[2]));
+  /* ---------- sheets ---------- */
+  var scrim = $('scrim');
+  var sheets = [$('sheetQty'), $('sheetList')];
+  function openSheet(el, focusEl) {
+    lastFocus = document.activeElement;
+    sheets.forEach(function (s) { s.hidden = s !== el; });
+    scrim.hidden = false;
+    if (focusEl) focusEl.focus();
+  }
+  function closeSheets() {
+    scrim.hidden = true;
+    sheets.forEach(function (s) { s.hidden = true; });
+    if (lastFocus && document.contains(lastFocus) && lastFocus.focus) lastFocus.focus();
+  }
+  scrim.addEventListener('click', function (e) {
+    if (e.target === scrim || e.target.closest('[data-close]')) closeSheets();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !scrim.hidden) closeSheets(); });
+  $('sheetQty').querySelector('.x').setAttribute('data-close', '');
+  $('sheetList').querySelector('.x').setAttribute('data-close', '');
+
+  /* ---------- quantity box ---------- */
+  function stepOf(u) { return u === 'kg' ? 0.5 : 1; }
+  function minOf(u) { return u === 'kg' ? 0.5 : 1; }
+  function maxOf(u) { return u === 'kg' ? 50 : 99; }
+
+  /* what each aisle lets you choose when adding to the list */
+  function cfgOf(cat, unit) {
+    if (cat.byItem) return { units: [unit], def: unit, presets: [] };            /* food stuffs: kilo items by kilo, piece items by piece */
+    if (cat.theme === 'attar') return { units: ['da'], def: 'da', presets: [100, 150, 200] };
+    if (cat.theme === 'meat') return { units: ['kg', 'da'], def: 'kg', presets: [1000, 1500, 2000] };
+    if (cat.theme === 'bakery' || cat.theme === 'clean') return { units: ['count'], def: 'count', presets: [] };
+    return { units: ['count', 'kg'], def: unit, presets: [] };
+  }
+  function openQty(cat, name, unit) {
+    var cfg = cfgOf(cat, unit), id = entryId(cat, name), e = findEntry(id);
+    var u = e && cfg.units.indexOf(e.unit) !== -1 ? e.unit : cfg.def;
+    var qty = e && e.unit === u ? e.qty : (u === 'da' ? cfg.presets[0] : 1);
+    Q = { custom: false, cat: cat, name: name, id: id, cfg: cfg, unit: u, qty: qty };
+    $('qtyTitle').hidden = false;
+    $('qtyTitle').textContent = name;
+    $('qtyTitle').setAttribute('dir', 'auto');
+    $('customName').hidden = true;
+    $('qtyErr').hidden = true;
+    showQty(!!e, null);
+  }
+  /* the Add folder: a product of your own, straight to the list */
+  function openCustom() {
+    Q = { custom: true, cat: { ar: 'منتج مضاف' }, name: '', id: null, cfg: { units: ['count', 'kg'], def: 'count', presets: [] }, unit: 'count', qty: 1 };
+    $('qtyTitle').hidden = true;
+    var inp = $('customName');
+    inp.hidden = false;
+    inp.value = '';
+    $('qtyErr').hidden = true;
+    showQty(false, inp);
+  }
+  function showQty(had, focusEl) {
+    $('qtyOk').textContent = had ? 'تحديث اللائحة' : 'إضافة إلى اللائحة';
+    $('qtyDel').hidden = !had;
+    var seg = $('unitSeg');
+    seg.innerHTML = '';
+    seg.hidden = Q.cfg.units.length < 2;
+    Q.cfg.units.forEach(function (k) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('data-u', k); b.textContent = ULAB[k];
+      seg.appendChild(b);
+    });
+    var pr = $('presets');
+    pr.innerHTML = '';
+    Q.cfg.presets.forEach(function (v) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'preset'; b.setAttribute('data-v', v); b.textContent = v + ' DA';
+      pr.appendChild(b);
+    });
+    syncQty();
+    openSheet($('sheetQty'), focusEl || $('qtyOk'));
+  }
+  function syncQty() {
+    var money = Q.unit === 'da';
+    $('stepper').hidden = money;
+    $('presets').hidden = !money;
+    $('qtyVal').textContent = fmt(Q.qty);
+    $('qtyUnit').textContent = UNIT[Q.unit];
+    $('minus').disabled = Q.qty <= minOf(Q.unit);
+    $('plusBtn').disabled = Q.qty >= maxOf(Q.unit);
+    Array.prototype.forEach.call($('unitSeg').querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-u') === Q.unit ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call($('presets').querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', Number(b.getAttribute('data-v')) === Q.qty ? 'true' : 'false');
+    });
+  }
+  $('unitSeg').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-u]');
+    if (!b || !Q) return;
+    var u = b.getAttribute('data-u'), prev = Q.unit;
+    if (u === prev) return;
+    Q.unit = u;
+    if (u === 'da') Q.qty = Q.cfg.presets[0];
+    else if (prev === 'da') Q.qty = 1;
+    else Q.qty = u === 'count' ? Math.max(1, Math.ceil(Q.qty)) : Math.max(0.5, Q.qty);
+    syncQty();
+  });
+  $('presets').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-v]');
+    if (!b || !Q) return;
+    Q.qty = Number(b.getAttribute('data-v'));
+    syncQty();
+  });
+  $('minus').addEventListener('click', function () {
+    Q.qty = Math.max(minOf(Q.unit), Q.qty - stepOf(Q.unit));
+    syncQty();
+  });
+  $('plusBtn').addEventListener('click', function () {
+    Q.qty = Math.min(maxOf(Q.unit), Q.qty + stepOf(Q.unit));
+    syncQty();
+  });
+  $('customName').addEventListener('input', function () { $('qtyErr').hidden = true; });
+  $('qtyOk').addEventListener('click', function () {
+    var name = Q.name, id = Q.id;
+    if (Q.custom) {
+      name = $('customName').value.trim();
+      if (!name) {
+        $('qtyErr').textContent = 'اكتب اسم المنتج أولاً.';
+        $('qtyErr').hidden = false;
+        $('customName').focus();
+        return;
+      }
+      id = 'custom|' + name;
+    }
+    var e = findEntry(id);
+    if (e) { e.qty = Q.qty; e.unit = Q.unit; }
+    else S.list.push({ id: id, cat: Q.cat.ar, name: name, qty: Q.qty, unit: Q.unit, bought: false });
+    save(); updateBadges(); closeSheets(); renderItems();
+  });
+  $('qtyDel').addEventListener('click', function () {
+    S.list = S.list.filter(function (e) { return e.id !== Q.id; });
+    save(); updateBadges(); closeSheets(); renderItems();
+  });
+
+  /* shopping list */
+  function openList() {
+    $('shareMsg').textContent = '';
+    disarmClear();
+    renderRows();
+    openSheet($('sheetList'), $('sheetList').querySelector('.x'));
+  }
+  function renderRows() {
+    var rows = ordered();
+    var ul = $('rows');
+    ul.innerHTML = '';
+    rows.forEach(function (e) {
+      var li = document.createElement('li');
+      li.className = e.bought ? 'done' : '';
+      li.innerHTML = '<button class="chk" type="button">' + CHK + '</button>' +
+        '<div class="rinfo"><span class="rname" dir="auto"></span><span class="rmeta"></span></div>' +
+        '<button class="x" type="button" aria-label="حذف">' + XICON + '</button>';
+      li.querySelector('.rname').textContent = e.name;
+      li.querySelector('.rmeta').textContent = e.cat + ' · ' + qtyText(e);
+      var chk = li.querySelector('.chk');
+      chk.setAttribute('aria-pressed', e.bought ? 'true' : 'false');
+      chk.setAttribute('aria-label', e.bought ? 'ألغِ تعليم ' + e.name : 'علّم ' + e.name + ' كمشتراة');
+      chk.addEventListener('click', function () {
+        e.bought = !e.bought; save(); updateBadges(); renderRows(); renderItems();
+      });
+      li.querySelector('.x').addEventListener('click', function () {
+        S.list = S.list.filter(function (z) { return z.id !== e.id; });
+        save(); updateBadges(); renderRows(); renderItems();
+      });
+      ul.appendChild(li);
+    });
+    var empty = $('listEmpty');
+    empty.hidden = rows.length > 0;
+    empty.textContent = 'القائمة فارغة. اختر قسماً ثم اضغط على أي منتج لإضافته.';
+    $('shareBtn').disabled = $('clearBtn').disabled = rows.length === 0;
+  }
+  $('listBtn').addEventListener('click', openList);
+
+  /* share: draw the list as a retro card image, then hand it to the viewer to save or share */
+  function rr(c, x, y, w, h, r) {
+    c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+  }
+  function fit(c, text, maxW) {
+    var t = text;
+    while (c.measureText(t).width > maxW && t.length > 1) t = t.slice(0, -1);
+    return t === text ? t : t + '…';
+  }
+  async function makeImage() {
+    try {
+      await Promise.all([
+        document.fonts.load('800 26px Tajawal'), document.fonts.load('700 22px Tajawal'),
+        document.fonts.load('500 20px Tajawal'), document.fonts.load('400 60px Lalezar')
+      ]);
+    } catch (e) {}
+    var rows = ordered();
+    var W = 720, P = 36, TG = 28, RH = 80, HEAD = 150, FOOT = 92;
+    var cardH = HEAD + rows.length * RH + FOOT;
+    var H = P * 2 + TG + cardH + 8;
+    var sc = 2, cv = document.createElement('canvas');
+    cv.width = W * sc; cv.height = H * sc;
+    var c = cv.getContext('2d');
+    c.scale(sc, sc);
+    c.direction = 'rtl';
+    c.fillStyle = '#efeeec'; c.fillRect(0, 0, W, H);
+    c.fillStyle = 'rgba(10,10,10,0.1)';
+    for (var yy = 7; yy < H; yy += 14) for (var xx = 7; xx < W; xx += 14) c.fillRect(xx, yy, 1.4, 1.4);
+    var cx = P, cy = P + TG, cw = W - 2 * P;
+    c.fillStyle = '#0a0a0a'; rr(c, cx + 8, cy + 8, cw, cardH, 16); c.fill();
+    c.fillStyle = '#ffffff'; rr(c, cx, cy, cw, cardH, 16); c.fill();
+    c.lineWidth = 4; c.strokeStyle = '#0a0a0a'; c.stroke();
+    /* tab with the date */
+    var tx = cx + 28, tw = 250;
+    c.beginPath(); c.moveTo(tx, cy - 2); c.lineTo(tx, cy - TG + 12); c.arcTo(tx, cy - TG, tx + 12, cy - TG, 12);
+    c.lineTo(tx + tw - 12, cy - TG); c.arcTo(tx + tw, cy - TG, tx + tw, cy - TG + 12, 12); c.lineTo(tx + tw, cy - 2);
+    c.fillStyle = '#00bfa5'; c.fill(); c.lineWidth = 4; c.stroke();
+    var date = '';
+    try { date = new Date().toLocaleDateString('ar-DZ-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) {}
+    c.fillStyle = '#0a0a0a'; c.textAlign = 'center'; c.font = '800 17px Tajawal, sans-serif';
+    c.fillText(date, tx + tw / 2, cy - 8);
+    /* title with highlighter */
+    c.textAlign = 'right'; c.font = '400 60px Lalezar, Tajawal, sans-serif';
+    var tr = cx + cw - 36, ty = cy + 90, tm = c.measureText('قائمة التسوق').width;
+    c.fillStyle = '#00bfa5'; c.fillRect(tr - tm - 8, ty - 12, tm + 16, 22);
+    c.fillStyle = '#0a0a0a'; c.fillText('قائمة التسوق', tr, ty);
+    /* count pill */
+    c.font = '800 22px Tajawal, sans-serif';
+    var label = rows.length + ' منتج', lw = c.measureText(label).width + 32;
+    c.fillStyle = '#fff'; rr(c, cx + 36, cy + 46, lw, 46, 23); c.fill();
+    c.lineWidth = 3; c.stroke();
+    c.fillStyle = '#0a0a0a'; c.textAlign = 'center'; c.fillText(label, cx + 36 + lw / 2, cy + 77);
+    /* rows */
+    var left = cx + 36, right = cx + cw - 36;
+    rows.forEach(function (e, i) {
+      var ry = cy + HEAD + i * RH;
+      c.setLineDash([7, 7]); c.lineWidth = 2; c.strokeStyle = '#0a0a0a';
+      c.beginPath(); c.moveTo(left, ry); c.lineTo(right, ry); c.stroke(); c.setLineDash([]);
+      var bs = 34, bx = right - bs, by = ry + (RH - bs) / 2;
+      c.fillStyle = e.bought ? '#00bfa5' : '#ffffff'; rr(c, bx, by, bs, bs, 7); c.fill();
+      c.lineWidth = 3; c.stroke();
+      if (e.bought) {
+        c.beginPath(); c.moveTo(bx + 8, by + 18); c.lineTo(bx + 15, by + 25); c.lineTo(bx + 27, by + 10);
+        c.lineWidth = 4; c.lineCap = 'round'; c.lineJoin = 'round'; c.stroke();
+      }
+      var nr = bx - 18;
+      c.textAlign = 'right'; c.fillStyle = '#0a0a0a'; c.font = '800 28px Tajawal, sans-serif';
+      var nm = fit(c, e.name, nr - left - 200);
+      c.fillText(nm, nr, ry + 38);
+      if (e.bought) {
+        var nw = c.measureText(nm).width;
+        c.lineWidth = 3; c.beginPath(); c.moveTo(nr - nw, ry + 29); c.lineTo(nr, ry + 29); c.stroke();
+      }
+      c.fillStyle = '#4a4947'; c.font = '500 20px Tajawal, sans-serif';
+      c.fillText(e.cat, nr, ry + 64);
+      c.fillStyle = '#0a0a0a'; c.textAlign = 'left'; c.font = '800 26px Tajawal, sans-serif';
+      c.fillText(qtyText(e), left, ry + 50);
+    });
+    /* footer */
+    var fy = cy + HEAD + rows.length * RH;
+    c.setLineDash([7, 7]); c.lineWidth = 2; c.beginPath(); c.moveTo(left, fy); c.lineTo(right, fy); c.stroke(); c.setLineDash([]);
+    var done = rows.filter(function (e) { return e.bought; }).length;
+    c.textAlign = 'center'; c.fillStyle = '#0a0a0a'; c.font = '700 22px Tajawal, sans-serif';
+    c.fillText(done + ' من ' + rows.length + ' تم شراؤها', cx + cw / 2, fy + 54);
+    return new Promise(function (res) { cv.toBlob(res, 'image/png'); });
+  }
+  $('shareBtn').addEventListener('click', async function () {
+    var m = $('shareMsg');
+    if (!S.list.length) return;
+    m.textContent = 'جارٍ تجهيز الصورة…';
+    try {
+      var blob = await makeImage();
+      if (!blob) throw { code: 'bad_request' };
+      var d = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+      if (!d) { m.textContent = 'الحفظ غير متاح في هذا العرض. افتح الصفحة في تطبيق Claude أو في المتصفح.'; return; }
+      await d.save({ filename: 'shopping-list.png', data: blob });
+      m.textContent = 'تم. افتح الصورة وشاركها مع من تشاء.';
+    } catch (err) {
+      m.textContent = err && err.code === 'declined' ? 'تم الإلغاء.' : 'تعذر حفظ الصورة. حاول مرة أخرى.';
     }
   });
-  updateCount();
-
-  function openSheet() {
-    lastFocus = document.activeElement;
-    input.value = '';
-    err.textContent = '';
-    scrim.hidden = false;
-    input.focus();
+  /* clear all: first tap arms the button, second tap within 4 seconds clears */
+  var clearTimer = null;
+  function disarmClear() {
+    clearTimeout(clearTimer);
+    clearTimer = null;
+    var b = $('clearBtn');
+    b.classList.remove('armed');
+    b.textContent = 'مسح الكل';
   }
-  function closeSheet() {
-    scrim.hidden = true;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var v = input.value.trim();
-    if (!v) { err.textContent = 'اكتب اسم القسم أولاً.'; input.focus(); return; }
-    if (names.indexOf(v) !== -1) { err.textContent = 'هذا القسم موجود بالفعل.'; input.focus(); return; }
-    names.push(v);
-    var f = makeFolder('tag', v, '٠ منتج', 'fresh');
-    grid.insertBefore(f, addBtn);
-    updateCount();
-    scrim.hidden = true;
-    lastFocus = f;
-    f.focus();
+  $('clearBtn').addEventListener('click', function () {
+    if (!S.list.length) return;
+    if (!clearTimer) {
+      var b = this;
+      b.classList.add('armed');
+      b.textContent = 'اضغط للتأكيد';
+      clearTimer = setTimeout(disarmClear, 4000);
+      return;
+    }
+    disarmClear();
+    S.list = [];
+    save(); updateBadges(); renderRows(); renderItems();
+    $('shareMsg').textContent = 'تم مسح القائمة.';
   });
-  document.getElementById('cancel').addEventListener('click', closeSheet);
-  scrim.addEventListener('click', function (e) { if (e.target === scrim) closeSheet(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !scrim.hidden) closeSheet(); });
+
+  renderHome();
+  updateBadges();
+  loadData();
 })();
 </script>
 
