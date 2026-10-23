@@ -19,7 +19,7 @@
       '<span class="tab"><span class="tabtxt"></span></span>' +
       '<span class="card"><span class="art">' + (isAdd ? A.ART.add : A.ART[c.art]) + '</span>' +
       '<span class="row"><span class="name"></span>' + A.CHEV + '</span></span>';
-    el.querySelector('.tabtxt').textContent = isAdd ? 'منتج جديد' : c.items.length + ' منتج';
+    el.querySelector('.tabtxt').textContent = isAdd ? 'منتج جديد' : c.items.length;
     el.querySelector('.name').textContent = nm;
     if (isAdd) el.addEventListener('click', G.openCustom);
     return el;

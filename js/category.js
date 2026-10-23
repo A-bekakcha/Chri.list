@@ -22,7 +22,7 @@
     var q = query.trim().toLowerCase();
     var shown = q ? all.filter(function (x) { return x.n.toLowerCase().indexOf(q) !== -1; }) : all;
     $('q').hidden = all.length < 12 && !q;
-    $('catCount').textContent = all.length + ' منتج';
+    $('catCount').textContent = all.length ;
     itemsEl.innerHTML = '';
     shown.forEach(function (x) {
       var id = G.entryId(cat.ar, x.n), e = G.findEntry(id);

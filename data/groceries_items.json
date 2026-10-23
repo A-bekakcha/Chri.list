@@ -35,6 +35,7 @@
         "قرع",
         "سبانخ",
         "خس",
+        "قرنبيط",
         "فاصوليا خضراء",
         "فاصوليا حمراء"
       ]
@@ -64,7 +65,7 @@
             "سكر",
             "ملح",
             "قهوة",
-            "crème chantilly"
+            "Crème chantilly"
           ]
         },
         {
@@ -74,31 +75,33 @@
             {
               "name": "جبن",
               "options": [
-                "بالقطعة",
+                "Portion",
                 "Monlait",
-                "جبن بيتزا",
-                "fromage rouge",
-                "شرائح"
+                "Râpé",
+                "Rouge",
+                "Slices"
               ]
             },
             "حليب",
+            "Yaourt",
             "لبن",
             "زبدة",
-            "crème fraîche",
-            "yaourt",
+            "Crème fraîche",
             "بيض",
             "زيت",
             "تونة",
-            "صلصة طماطم",
+            "Ketchup",
+            "Mayonnaise",
+            "Hrissa",
             "خردل",
             "عسل",
             "شاي",
             "بسكويت",
             "خميرة",
-            "glaçage au chocolat",
-            "papier d'aluminium",
-            "papier cellophane",
-            "papier cuisine"
+            "Glaçage au chocolat",
+            "Papier d'aluminium",
+            "Papier cellophane",
+            "Papier cuisine"
           ]
         }
       ]
@@ -121,60 +124,55 @@
       "type": "Cleaning Products",
       "name_ar": "منتجات التنظيف",
       "kinds": [
-        "machine à laver",
+        "Liquide machine à laver",
         "Omo",
         "Pril Isis",
-        "halfa",
-        "papier",
-        "désodorisant",
-        "nettoyage des toilettes",
-        "javel",
-        "sanibon",
-        "gel douche",
-        "shampoing",
-        "flit",
-        "dentifrice",
-        "brosse à dents",
-        "après-shampoing",
-        "éponge",
-        "savon",
-        "savon liquide"
+        "Halfa",
+        "Papier",
+        "Désodorisant",
+        "Nettoyage des toilettes",
+        "Javel",
+        "Sanibon",
+        "Eponge",
+        "Gel douche",
+        "Shampoing",
+        "Flit",
+        "Dentifrice",
+        "Brosse à dents",
+        "Après-shampoing",
+        "Savon",
+        "Savon liquide"
       ]
     },
     {
       "type": "Attar",
       "name_ar": "عطار",
       "kinds": [
-        "عسل",
-        "أعشاب",
-        "بهارات",
-        "معدنوس",
-        "قزبر",
         "كركم",
         "زعتر",
         "زنجبيل",
-        "سماق",
-        "حبوب",
+        "الحبة السوداء",
         "قرفة مطحونة",
         "قرفة عيدان",
-        "شيبة",
         "زعفران",
         "رأس الحانوت",
         "كمون",
         "فلفل أسود",
-        "فلفل أحمر"
+        "فلفل أحمر",
+        "حمار"
       ]
     },
     {
       "type": "Bakery",
       "name_ar": "خبز",
       "kinds": [
-        "توست",
         "خبز",
         "مطلوع",
-        "كراواس",
-        "ميلفاي",
-        "بتيبان"
+        "Croissant",
+        "Pain au chocolat",
+        "Mille feuille",
+        "Toast",
+        "Patisserie"
       ]
     }
   ]
