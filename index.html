@@ -306,6 +306,8 @@ h1:focus { outline: none; }
 .preset:focus-visible { outline: 3px dashed var(--ink); outline-offset: 3px; }
 #clearBtn { color: var(--danger); }
 #clearBtn.armed { background: var(--danger); color: var(--white); }
+.presets.opts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.opts .preset { font-size: 17px; line-height: 1.3; overflow-wrap: anywhere; }
 .sheet-head .field { flex: 1; width: auto; min-width: 0; }
 .loadbox { display: grid; gap: 12px; justify-items: start; margin: 22px 6px 0; }
 .loadbox p { margin: 0; font: 700 15px/1.6 var(--f-body); color: var(--muted); }
@@ -380,6 +382,16 @@ h1:focus { outline: none; }
       </div>
       <button class="btn primary wide" type="button" id="qtyOk">إضافة إلى اللائحة</button>
       <button class="btn ghost" type="button" id="qtyDel" hidden>إزالة من اللائحة</button>
+    </section>
+
+    <section class="sheet" id="sheetOpts" role="dialog" aria-modal="true" aria-labelledby="optsTitle" hidden>
+      <div class="sheet-head">
+        <h2 id="optsTitle"></h2>
+        <button class="x" type="button" data-close aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <p class="note">اختر النوع الذي تريده، يمكنك اختيار أكثر من نوع.</p>
+      <div class="presets opts" id="opts"></div>
+      <button class="btn primary wide" type="button" id="optsOk">إضافة إلى اللائحة</button>
     </section>
 
     <section class="sheet" id="sheetList" role="dialog" aria-modal="true" aria-labelledby="listTitle" hidden>
@@ -526,7 +538,10 @@ h1:focus { outline: none; }
   var Q = null;
 
   function fmt(q) { return String(Math.round(q * 10) / 10); }
-  function qtyText(e) { return e.unit === 'da' ? fmt(e.qty) + ' DA' : fmt(e.qty) + ' ' + UNIT[e.unit]; }
+  function qtyText(e) {
+    if (e.noQty) return '';
+    return e.unit === 'da' ? fmt(e.qty) + ' DA' : fmt(e.qty) + ' ' + UNIT[e.unit];
+  }
   function ordered() {
     return S.list.filter(function (e) { return !e.bought; }).concat(S.list.filter(function (e) { return e.bought; }));
   }
@@ -534,6 +549,11 @@ h1:focus { outline: none; }
   function findEntry(id) { return S.list.filter(function (e) { return e.id === id; })[0]; }
 
   /* ---------- build the categories from the JSON ---------- */
+  /* a kind is a plain name, or { name, options } when the product has types to choose from (e.g. cheese) */
+  function pushKind(c, k, u) {
+    if (typeof k === 'string') c.items.push({ n: k, u: u, opts: null });
+    else if (k && k.name) c.items.push({ n: k.name, u: u, opts: Array.isArray(k.options) && k.options.length ? k.options : null });
+  }
   function buildCats(json) {
     var list = (json && json.groceries) || [];
     var cats = list.map(function (g, i) {
@@ -544,10 +564,10 @@ h1:focus { outline: none; }
         c.byItem = true;
         g.sub_types.forEach(function (s) {
           var u = s.type === 'By Kg' ? 'kg' : 'count';
-          (s.kinds || []).forEach(function (n) { c.items.push({ n: n, u: u }); });
+          (s.kinds || []).forEach(function (k) { pushKind(c, k, u); });
         });
       } else {
-        (g.kinds || []).forEach(function (n) { c.items.push({ n: n, u: m.unit }); });
+        (g.kinds || []).forEach(function (k) { pushKind(c, k, m.unit); });
       }
       return c;
     });
@@ -635,16 +655,21 @@ h1:focus { outline: none; }
     itemsEl.innerHTML = '';
     shown.forEach(function (x) {
       var id = entryId(cat, x.n), e = findEntry(id);
+      var picks = x.opts ? S.list.filter(function (z) { return z.id.indexOf(id + '|') === 0; }) : [];
+      var on = x.opts ? picks.length > 0 : !!e;
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'item' + (e ? ' in' : '');
+      b.className = 'item' + (on ? ' in' : '');
       b.innerHTML = '<span class="plus" aria-hidden="true">' + PLUS + CHECK + '</span>' +
         '<span class="emb" aria-hidden="true">' + (GL[cat.theme] || GL.fruit) + '</span>' +
         '<span class="iname" dir="auto"></span><span class="iq"></span>';
       b.querySelector('.iname').textContent = x.n;
-      if (e) b.querySelector('.iq').textContent = qtyText(e);
-      b.setAttribute('aria-label', x.n + (e ? '، في اللائحة: ' + qtyText(e) : ''));
-      b.addEventListener('click', function () { openQty(cat, x.n, x.u); });
+      var tag = '';
+      if (x.opts) tag = picks.length === 1 ? picks[0].opt : (picks.length ? picks.length + ' أنواع' : '');
+      else if (e) tag = qtyText(e);
+      if (tag) b.querySelector('.iq').textContent = tag;
+      b.setAttribute('aria-label', x.n + (tag ? '، في اللائحة: ' + tag : (x.opts ? '، اختر النوع' : '')));
+      b.addEventListener('click', function () { if (x.opts) openOpts(cat, x); else openQty(cat, x.n, x.u); });
       itemsEl.appendChild(b);
     });
     var none = $('none');
@@ -671,7 +696,7 @@ h1:focus { outline: none; }
 
   /* ---------- sheets ---------- */
   var scrim = $('scrim');
-  var sheets = [$('sheetQty'), $('sheetList')];
+  var sheets = [$('sheetQty'), $('sheetOpts'), $('sheetList')];
   function openSheet(el, focusEl) {
     lastFocus = document.activeElement;
     sheets.forEach(function (s) { s.hidden = s !== el; });
@@ -689,6 +714,49 @@ h1:focus { outline: none; }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !scrim.hidden) closeSheets(); });
   $('sheetQty').querySelector('.x').setAttribute('data-close', '');
   $('sheetList').querySelector('.x').setAttribute('data-close', '');
+
+  /* ---------- type box (cheese etc.): pick the types you want, no quantity ---------- */
+  var OP = null;
+  function openOpts(cat, x) {
+    var base = entryId(cat, x.n);
+    var pre = S.list.filter(function (z) { return z.id.indexOf(base + '|') === 0; }).map(function (z) { return z.opt; });
+    OP = { cat: cat, x: x, base: base, sel: pre.slice(), had: pre.length > 0 };
+    $('optsTitle').textContent = x.n;
+    $('optsTitle').setAttribute('dir', 'auto');
+    var box = $('opts');
+    box.innerHTML = '';
+    x.opts.forEach(function (o) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'preset'; b.setAttribute('data-o', o); b.setAttribute('dir', 'auto');
+      b.textContent = o;
+      box.appendChild(b);
+    });
+    syncOpts();
+    openSheet($('sheetOpts'), box.querySelector('button'));
+  }
+  function syncOpts() {
+    Array.prototype.forEach.call($('opts').querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', OP.sel.indexOf(b.getAttribute('data-o')) !== -1 ? 'true' : 'false');
+    });
+    $('optsOk').textContent = OP.had ? 'تحديث اللائحة' : 'إضافة إلى اللائحة';
+    $('optsOk').disabled = !OP.sel.length && !OP.had;
+  }
+  $('opts').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-o]');
+    if (!b || !OP) return;
+    var o = b.getAttribute('data-o'), i = OP.sel.indexOf(o);
+    if (i === -1) OP.sel.push(o); else OP.sel.splice(i, 1);
+    syncOpts();
+  });
+  $('optsOk').addEventListener('click', function () {
+    if (!OP) return;
+    S.list = S.list.filter(function (z) { return !(z.id.indexOf(OP.base + '|') === 0 && OP.sel.indexOf(z.opt) === -1); });
+    OP.sel.forEach(function (o) {
+      var id = OP.base + '|' + o;
+      if (!findEntry(id)) S.list.push({ id: id, cat: OP.cat.ar, name: OP.x.n + ' · ' + o, opt: o, qty: 1, unit: 'count', noQty: true, bought: false });
+    });
+    save(); updateBadges(); closeSheets(); renderItems();
+  });
 
   /* ---------- quantity box ---------- */
   function stepOf(u) { return u === 'kg' ? 0.5 : 1; }
@@ -827,7 +895,7 @@ h1:focus { outline: none; }
         '<div class="rinfo"><span class="rname" dir="auto"></span><span class="rmeta"></span></div>' +
         '<button class="x" type="button" aria-label="حذف">' + XICON + '</button>';
       li.querySelector('.rname').textContent = e.name;
-      li.querySelector('.rmeta').textContent = e.cat + ' · ' + qtyText(e);
+      li.querySelector('.rmeta').textContent = e.cat + (qtyText(e) ? ' · ' + qtyText(e) : '');
       var chk = li.querySelector('.chk');
       chk.setAttribute('aria-pressed', e.bought ? 'true' : 'false');
       chk.setAttribute('aria-label', e.bought ? 'ألغِ تعليم ' + e.name : 'علّم ' + e.name + ' كمشتراة');
